@@ -18,6 +18,7 @@ public class  Hunt
 
   public Hunt(int newHuntRank, String newMonster, HuntType newHuntDifficulty, short newDeviantLevel)
   {
+    this.huntRank     = newHuntRank;
     this.monster      = newMonster;
     this.difficulty   = newHuntDifficulty.toString();
     this.deviantLevel = newDeviantLevel;
@@ -25,12 +26,14 @@ public class  Hunt
 
   public Hunt(int newHuntRank, String newMonster, HuntType newHuntDifficulty)
   {
+    this.huntRank     = newHuntRank;
     this.monster      = newMonster;
     this.difficulty   = newHuntDifficulty.toString();
   }
 
   public Hunt(int newHuntRank, HuntType newHuntDifficulty)
   {
+    this.huntRank     = newHuntRank;
     this.difficulty   = newHuntDifficulty.toString();
   }
 
