@@ -1,3 +1,5 @@
+package neko;
+
 public class HunterRank
 {
   private int rank = 0;
