@@ -48,3 +48,5 @@ Temporary Items
 src/neko/Secret.java
 build/classes/neko/Secret.class
 Neko_Profiles.txt
+.idea/*
+neko.iml
