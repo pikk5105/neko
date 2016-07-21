@@ -13,43 +13,37 @@ import java.util.List;
  *
  * @author Brady
  */
-public class Leader {
-    Profile profile=null;
-    int huntRank=0;
-    String huntType="";//high low diviant
-    String hunting="";
-    String hallID="";
-    String passcode="";
-    
-    OffsetDateTime now=OffsetDateTime.now();
-    
+public class Leader
+{
+    Profile profile     = null;
+    private Room room   = null;
+    OffsetDateTime now  = OffsetDateTime.now();
+
     //search filters
-    int rankH=999;
-    int rankL=1;
-    int slots=3;
-    String weapon="";
-    String role="";
-    String lookingToHunt="";
-    String huntTypeSearch = "";// high low deviant
-    
-    List<Merc> mercList = new ArrayList<>();//list from search
+    int rankH             = 999;
+    int rankL             = 1;
+    int slots             = 3;
+    String weapon         = "";
+    String role           = "";
+    String lookingToHunt  = "";
+    String huntTypeSearch = "";     // high low deviant
+
+    List<Merc> mercList = new ArrayList<>();    //list from search
     Merc requestFrom = null;
-    
-    Leader(Profile profile, int huntRank, String hunting, String hallID, String passcode, boolean Deviant){
-        this.profile=profile;
-        this.huntRank=huntRank;
-        if (huntRank>4){
-            this.huntType="High";
-        }else{
-            this.huntType="Low";
-        }
-        this.rankL=huntRank;
-        this.hunting=hunting;
-        this.hallID=hallID;
-        this.passcode=passcode;
-        if (Deviant==true){
-            this.huntType="Deviant";
-        }
+
+    Leader(Profile newProfile,
+           int newHuntRank,
+           String newRoomDescription,
+           String newHallID,
+           String newPasscode,
+           boolean newIsDeviant,
+           short newDeviantLevel)
+    {
+        this.profile    = newProfile;
     }
-    
+
+    public Room GetRoom()
+    {
+        return room;
+    }
 }

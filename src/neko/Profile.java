@@ -14,10 +14,10 @@ import java.util.List;
  * @author Brady
  */
 public class Profile {
-    String UserID;
-    List<String> Weapons = new ArrayList<String>();
+    private String UserID;
+    private List<String> Weapons = new ArrayList<String>();
     List<String> Roles = new ArrayList<String>();
-    int rank;
+    HunterRank rank = null;
     
     Profile(String UserId, String[] Weapons, String[] Roles, int rank){
         this.UserID=UserId;
@@ -25,7 +25,7 @@ public class Profile {
         this.Weapons.remove("");
         this.Roles.addAll(Arrays.asList(Roles));
         this.Roles.remove("");
-        this.rank=rank;
+        this.rank = new HunterRank(rank);
     }
     void addWeapon(String weapon){
         if(Weapons.contains(weapon)){
@@ -47,5 +47,15 @@ public class Profile {
     
     void removeRole(String role){
         Roles.remove(role);
+    }
+
+    public void SetUserID(String id)
+    {
+        UserID = id;
+    }
+
+    public String GetUserID()
+    {
+        return UserID;
     }
 }

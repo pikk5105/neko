@@ -1,74 +1,95 @@
 package neko;
 
-public class  Hunt
+/**
+ * Created by Dominik on 20.07.2016.
+ */
+
+public class Hunt
 {
-  public enum HuntType
-  {
-    Low,
-    High,
-    Deviant
-  }
+    public enum HuntType
+    {
+        Low,
+        High,
+        Deviant
+    }
 
-  //HuntType huntType = new HuntType();
+    private int huntRank        = 1;
+    private String monster      = "";
+    private int deviantLevel  = 1;
+    private String difficulty   = "";
 
-  private int huntRank        = 1;
-  private String monster      = "";
-  private short deviantLevel  = 1;
-  private String difficulty   = "";
+    Hunt(int newHuntRank, String newMonster, HuntType newHuntDifficulty, short newDeviantLevel)
+    {
+        this.huntRank     = newHuntRank;
+        this.monster      = newMonster;
+        DecideHuntType(newHuntRank, true);
+        this.deviantLevel = newDeviantLevel;
+    }
 
-  public Hunt(int newHuntRank, String newMonster, HuntType newHuntDifficulty, short newDeviantLevel)
-  {
-    this.huntRank     = newHuntRank;
-    this.monster      = newMonster;
-    this.difficulty   = newHuntDifficulty.toString();
-    this.deviantLevel = newDeviantLevel;
-  }
+    Hunt(int newHuntRank, String newMonster)
+    {
+        this.huntRank     = newHuntRank;
+        this.monster      = newMonster;
+        DecideHuntType(newHuntRank, false);
+    }
 
-  public Hunt(int newHuntRank, String newMonster, HuntType newHuntDifficulty)
-  {
-    this.huntRank     = newHuntRank;
-    this.monster      = newMonster;
-    this.difficulty   = newHuntDifficulty.toString();
-  }
+    Hunt(int newHuntRank)
+    {
+        this.huntRank     = newHuntRank;
+        DecideHuntType(newHuntRank, false);
+    }
 
-  public Hunt(int newHuntRank, HuntType newHuntDifficulty)
-  {
-    this.huntRank     = newHuntRank;
-    this.difficulty   = newHuntDifficulty.toString();
-  }
+    public void SetMonster(String newMonster)
+    {
+        monster = newMonster;
+    }
 
-  public void SetMonster(String newMonster)
-  {
-    monster = newMonster;
-  }
+    public String GetMonster()
+    {
+        return monster;
+    }
 
-  public String GetMonster()
-  {
-    return monster;
-  }
+    private void DecideHuntType(int huntRank, boolean deviantHunt)
+    {
+        if(deviantHunt)
+        {
+            SetHuntType(HuntType.Deviant);
+        }
+        else
+        {
+            if (huntRank > 4)
+            {
+                SetHuntType(HuntType.High);
+            }
+            if (huntRank <= 3)
+            {
+                SetHuntType(HuntType.Low);
+            }
+        }
+    }
 
-  public void SetHuntType(HuntType newHuntType)
-  {
-    difficulty = newHuntType.toString();
-  }
+    public void SetHuntType(HuntType newHuntType)
+    {
+        difficulty = newHuntType.toString();
+    }
 
-  public String GetHuntType()
-  {
-    return difficulty;
-  }
+    public String GetHuntType()
+    {
+        return difficulty;
+    }
 
-  public void SetDeviantLevel(short newLevel)
-  {
-    deviantLevel = newLevel;
-  }
+    public void SetDeviantLevel(int newLevel)
+    {
+        deviantLevel = newLevel;
+    }
 
-  public void IncDeviantLevel()
-  {
-    SetDeviantLevel(deviantLevel++);
-  }
+    public void IncDeviantLevel()
+    {
+        SetDeviantLevel(deviantLevel++);
+    }
 
-  public short GetDeviantLevel()
-  {
-    return deviantLevel;
-  }
+    public int GetDeviantLevel()
+    {
+        return deviantLevel;
+    }
 }
