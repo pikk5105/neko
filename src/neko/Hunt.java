@@ -1,13 +1,15 @@
+package neko;
+
 public class  Hunt
 {
-  public enum HuntType =
+  public enum HuntType
   {
-    LowRank = "Low",
-    HighRank = "High",
-    Deviant = "Deviant"
+    Low,
+    High,
+    Deviant
   }
 
-  HuntType huntType = new HuntType();
+  //HuntType huntType = new HuntType();
 
   private int huntRank        = 1;
   private String monster      = "";
@@ -17,26 +19,19 @@ public class  Hunt
   public Hunt(int newHuntRank, String newMonster, HuntType newHuntDifficulty, short newDeviantLevel)
   {
     this.monster      = newMonster;
-    this.difficulty   = newHuntDifficulty;
-    this.deviantLevel = newDeviantLevel;
-  }
-
-  public Hunt(int newHuntRank, String newMonster, HuntType newHuntDifficulty, short newDeviantLevel)
-  {
-    this.monster      = newMonster;
-    this.difficulty   = newHuntDifficulty;
+    this.difficulty   = newHuntDifficulty.toString();
     this.deviantLevel = newDeviantLevel;
   }
 
   public Hunt(int newHuntRank, String newMonster, HuntType newHuntDifficulty)
   {
     this.monster      = newMonster;
-    this.difficulty   = newHuntDifficulty;
+    this.difficulty   = newHuntDifficulty.toString();
   }
 
   public Hunt(int newHuntRank, HuntType newHuntDifficulty)
   {
-    this.difficulty   = newHuntDifficulty;
+    this.difficulty   = newHuntDifficulty.toString();
   }
 
   public void SetMonster(String newMonster)
@@ -51,7 +46,7 @@ public class  Hunt
 
   public void SetHuntType(HuntType newHuntType)
   {
-    difficulty = newHuntType;
+    difficulty = newHuntType.toString();
   }
 
   public String GetHuntType()
@@ -66,7 +61,7 @@ public class  Hunt
 
   public void IncDeviantLevel()
   {
-    SetDeviantLevel(deviantLevel++)
+    SetDeviantLevel(deviantLevel++);
   }
 
   public short GetDeviantLevel()
