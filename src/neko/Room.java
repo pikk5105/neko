@@ -43,7 +43,7 @@ public class Room
                 String newRoomID,
                 String newPasscode,
                 int newHuntRank,
-                String newMonster,
+                String newMonster)
     {
         SetDescription(newRoomDescription);
         SetRoomID(newRoomID);
