@@ -37,7 +37,12 @@ public class Profile {
     void removeWeapon(String weapon){
         Weapons.remove(weapon);
     }
-    
+
+    public List<String> GetWeaponList()
+    {
+        return Weapons;
+    }
+
     void addRole(String role){
         if(Roles.contains(role)){
             return;

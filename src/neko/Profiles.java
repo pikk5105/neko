@@ -45,13 +45,13 @@ public class Profiles extends DataSource{
         //convert p to profile
         String weap="";
         String roles="";
-        for(String str : p.Weapons){
+        for(String str : p.GetWeaponList()){
             weap+=str+" ";
         }
         for(String str : p.Roles){
             roles+=str+" ";
         }
-        String[] profile = {p.UserID, weap, roles, Integer.toString(p.rank) };
+        String[] profile = {p.GetUserID(), weap, roles, Integer.toString(p.rank.GetRank()) };
         
         set(profile);
     }
