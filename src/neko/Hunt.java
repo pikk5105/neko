@@ -92,4 +92,14 @@ public class Hunt
     {
         return deviantLevel;
     }
+
+    public void SetHuntRank(int rank)
+    {
+        huntRank = rank;
+    }
+
+    public int GetHuntRank()
+    {
+        return huntRank;
+    }
 }
