@@ -60,7 +60,6 @@ public class Merc {
     }
     
     boolean hasWeapon(String weapon){
-        for(String myWeapon : profile.Weapons){
         for(String myWeapon : profile.GetWeaponList()){
             if (myWeapon.equalsIgnoreCase(weapon)){
                 return true;
