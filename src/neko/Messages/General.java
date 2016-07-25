@@ -9,4 +9,9 @@ public class General
     {
         return "Nya **__"+userName+"__**! Check your meowssages to fill your guild card info to start having a Nekool time.";
     }
+
+    public String UsageReminder(String userName)
+    {
+        return "Nya **__"+userName+"__**! check your meowssages to fill your guild card info to start having a Nekool time.";
+    }
 }
