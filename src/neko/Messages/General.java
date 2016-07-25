@@ -5,7 +5,7 @@ package neko.Messages;
  */
 public class General
 {
-    public String CheckUserDirectMessageDatabase(String userName)
+    public String NewUserGreeting(String userName)
     {
         return "Nya **__"+userName+"__**! Check your meowssages to fill your guild card info to start having a Nekool time.";
     }
