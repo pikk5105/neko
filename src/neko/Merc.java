@@ -14,7 +14,7 @@ import java.util.List;
  * @author Brady
  */
 public class Merc {
-    Profile profile;
+    private Profile profile;
     int huntRank=0;
     String hunting="";
     String huntType="";
@@ -50,7 +50,7 @@ public class Merc {
     }
     
     boolean hasRole(String role){
-        for(String myRole : profile.Roles){
+        for(String myRole : profile.GetRoleList()){
             if (myRole.equalsIgnoreCase(role)){
                 return true;
             }
@@ -67,5 +67,15 @@ public class Merc {
         }
         
         return false;
+    }
+
+    public void SetProfile(Profile profile)
+    {
+        this.profile = profile;
+    }
+
+    public Profile GetProfile()
+    {
+        return profile;
     }
 }

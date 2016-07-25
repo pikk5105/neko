@@ -46,4 +46,14 @@ public class Leader
     {
         return room;
     }
+
+    public void SetProfile(Profile profile)
+    {
+        this.profile = profile;
+    }
+
+    public Profile GetProfile()
+    {
+        return profile;
+    }
 }
