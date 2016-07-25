@@ -7,7 +7,7 @@ import neko.Messages.Error;
  * Created by Dominik on 21.07.2016.
  */
 public class MessageHandler {
-    private MessageHandler instance;
+    private static MessageHandler instance = new MessageHandler();
 
     public Error error;
     public General general;
@@ -20,7 +20,7 @@ public class MessageHandler {
         init();
     }
 
-    public MessageHandler GetInstance() {
+    public static MessageHandler GetInstance() {
         if (instance == null) {
             instance = new MessageHandler();
         }
