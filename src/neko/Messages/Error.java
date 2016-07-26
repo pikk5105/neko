@@ -38,6 +38,11 @@ public class Error
         return "Sorry, I could Moewnt find a role or weapon with that name. Do you want to see \"roles\" or \"weapons\"?";
     }
 
+    public String RoleOrWeaponNotFound()
+    {
+        return "I could meownt find that role or weapon of yours. do you want to see \"myRoles\" or \"myWeapons\"?";
+    }
+
     public String NotANumber()
     {
         return "MEOWCH, You are bad at math! Try using a number next time.";
