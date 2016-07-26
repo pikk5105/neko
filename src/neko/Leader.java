@@ -36,8 +36,7 @@ public class Leader
            String newRoomDescription,
            String newHallID,
            String newPasscode,
-           boolean newIsDeviant,
-           short newDeviantLevel)
+           boolean newIsDeviant)
     {
         this.profile    = newProfile;
     }

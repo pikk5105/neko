@@ -13,6 +13,11 @@ public class HunterRank
   {
     rank = newRank;
   }
+  
+  public void RankUp()
+  {
+    rank++;
+  }
 
   public int GetRank()
   {

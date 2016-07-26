@@ -29,38 +29,6 @@ import net.dv8tion.jda.hooks.ListenerAdapter;
 //CATastrophy
 //
 public class Neko extends ListenerAdapter{
-private final String helpMessage1 = "here are some catmands I can respmoewnd to.\n"
-                    + "just send me a purrsonal meowsage to talk to me.\n"
-                    + "`help` - See all the ameowzing things I can do\n\n"
-                    + "profile setup commands:\n"
-                    + "`add <X>` - Adds X to your roles or weapons\n"
-                    + "`remove <X>` - removes X from your roles or weapons\n"
-                    + "`roles` - Lists the current hunter roles I recognize\n"
-                    + "`myRoles` - Lists the roles you are willing to perform on a hunt, use the add command to add to it\n"
-                    + "`weapons` - Lists the weapons I recognize\n"
-                    + "`myWeapons` - Lists the weapons you like to use, use the add command to add to it\n"
-                    + "`myRank` - your online HR in Meownster Hunter Generations\n"
-                    + "`rankUp` - moves your HR up by one, Nyaxelent job!\n"
-                    + "`changeRank <X>` - changes your HR to X, useful for a if you forget to use rankup a few times.\n\n";
-private final String helpMessage2 = "Hunter finding commands:\n"
-                    + "`lookup <name>` - looks for the profile of a hunter.\n"
-                    + "`Hunters` - I'll tell you how many mercenaries and leaders are currently looking for Hunters.\n"
-                    + "`enlist merc <Rank of Quest> <looking to hunt>` - you will be added to the list of meownster Hunters looking for a group.\n"
-                    + "                    Rank of Quest is an HR number 1-999 (or d# for deviant hunts) and looking to hunt can be anything\n"
-                    + "`enlist leader <HallID> <Passcode> <Rank of Quest> <Hunting>` - your room will be added to my Meownster Hunter group List.\n"
-                    + "                    Rank of Quest is an HR number 1-999(or d# for deviant hunts) and looking to hunt can be anything\n"
-                    + "`delist` - unenlists you\n\n"
-                    + "Cammands to use while enlisted:\n"
-                    + "`filters` - lists all filters that you can currently use to find Hunters.\n"
-                    + "`addFilter <filter> <X>` - filters hunters with X\n"
-                    + "`removeFilter <filter>` - clears that filter field\n"
-                    + "`search` - executes a search using your added filters. Will show all results if you do not have any filters.\n"
-                    + "`ask <X>` - asks a Hunter by number on your most recent search to join your room, or invite you to their room\n"
-                    + "`spots <X>` - If you are a leader, it will let others know how many spots you have left.\n"
-                    + "                    a group with 0 spots will not show up in searches\n\n"
-                    + "Commands that can be used in Monster Hunter Gathering Hall channels:\n"
-                    + "`/neko lookup <X>` - looks for a hunter with the name X and displays basic info of them\n"
-                    + "`/neko myhunt` - if you are enlisted at a leader I will put your hall info in the chat you asked me in";
 
 Secret info = new Secret();
 private final List<String> modIDs = info.getModIDs();
@@ -72,13 +40,16 @@ String[] Roles = {"Damage", "Tank", "Status", "Support", "Mounter", "Other"};
 String[] Weapons = {"GS", "LS", "SnS", "DB", "Hammer", "HH", "Lance", "GL", "SA", "CB", "IG", "LBG", "HBG", "Bow", "Prowler"};
 String[] huntTypes = {"Low", "High", "Deviant"};
 
-String[] LeaderFilters ={"Rank>", "Rank<", "Role", "Weapon", "HuntRank", "HuntType", "LookingToHunt"};
-String[] MercFilters = {"Rank>", "Rank<", "HuntRank", "HuntType", "Hunting"};
+String[] leaderFilters ={"Rank>", "Rank<", "Role", "Weapon", "HuntRank", "HuntType", "LookingToHunt"};
+String[] mercFilters = {"Rank>", "Rank<", "HuntRank", "HuntType", "Hunting"};
 
 List<Leader> leaderList = new ArrayList<>();
 List<Merc> mercList = new ArrayList<>();
-//private profiles[] profilesList; not needed
 
+MessageHandler msg = MessageHandler.GetInstance() ;
+
+//private profiles[] profilesList; not needed
+// msg      msg.errors.InvalidHunterRank()
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         String message = event.getMessage().getRawContent();
@@ -89,44 +60,37 @@ List<Merc> mercList = new ArrayList<>();
                 //make profile
                 Profiles.getInstance().set(new String[] {event.getAuthor().getId(),"","","1"});
                 
-                event.getChannel().sendMessageAsync("Nya **__"+event.getAuthorName()+"__**! check your meowssages to fill your guild card info to start having a Nekool time.", null);
-                event.getAuthor().getPrivateChannel().sendMessageAsync(helpMessage1,null);
-                event.getAuthor().getPrivateChannel().sendMessageAsync(helpMessage2,null);
+                event.getChannel().sendMessageAsync(msg.general.NewUserGreeting(event.getAuthor().getUsername()), null);
+                event.getAuthor().getPrivateChannel().sendMessageAsync(msg.info.helpMessage1,null);
+                event.getAuthor().getPrivateChannel().sendMessageAsync(msg.info.helpMessage2,null);
                 event.getJDA().getUserById("135251434445733888").getPrivateChannel().sendMessageAsync(event.getAuthor().getId()+":0",null);
             }
             else{
-                
-                /*
-                else if(){
-                    
-                }*/
-                event.getChannel().sendMessageAsync("Nya **__"+event.getAuthorName()+"__**! send me a personal meowssage to list yourself, delist yourself, or ask me for help",null);    
+
+                event.getChannel().sendMessageAsync(msg.general.UsageReminder(event.getAuthor().getUsername()),null);    
                 event.getAuthor().getPrivateChannel().sendMessageAsync("how can I help you?",null);
             }
         }
 
         else if(message.equalsIgnoreCase("/neko hunters")){
             purgeLists(event.getJDA());
-            event.getChannel().sendMessageAsync("I am currently helping "+leaderList.size()+" leaders and "+mercList.size()+" hunters find a group!\nWhisper me to join in on the meownster hunting fun!",null);
+            event.getChannel().sendMessageAsync(msg.info.ListHuntersInQueueGreeting(leaderList.size(), mercList.size()),null);
         }
         
         else if(message.toLowerCase().equals("/neko myhunt")){
             Leader user=null;
             for(Leader u :leaderList){
-                if (u.profile.UserID.equals(event.getAuthor().getId())){
+                if (u.profile.GetUserID().equals(event.getAuthor().getId())){
                     user=u;
                 }
             }
                     
             if(user==null){
-                event.getChannel().sendMessageAsync("You are not listed as a leader, so I do moewt have gathering hall informeowtion.",null);
+                event.getChannel().sendMessageAsync(msg.error.NotListedAsLeader(),null);
                 return;
             }
                     
-            event.getChannel().sendMessageAsync("here is the informeowtion for "+event.getAuthorName()+"'s hunt:\n"
-                                                + "Hall ID: "+user.hallID+"\n"
-                                                + "Password: "+user.passcode+"\n"
-                                                + "Discription: "+user.hunting,null);
+            event.getChannel().sendMessageAsync(msg.info.GetRoomInfo(token, user),null);
                     
             return;
         }
@@ -135,27 +99,25 @@ List<Merc> mercList = new ArrayList<>();
             String name = message.substring(13);
             List<User> users = findUsers(name, event.getJDA().getGuildById("120889695658967041"));
             if (users.isEmpty()){
-                event.getChannel().sendMessageAsync("I couldnt find any hunters with that name!",null);
+                event.getChannel().sendMessageAsync(msg.error.NoSearchResult(),null);
                 return;
             }
             try{
             Profile found = Profiles.getInstance().getProfile(users.get(0).getId());
-            if(event.getJDA().getUserById(found.UserID)==null){
-                event.getChannel().sendMessageAsync("User is no longer in the guild.",null);
+            if(event.getJDA().getUserById(found.GetUserID())==null){
+                event.getChannel().sendMessageAsync(msg.error.UserLeftServer(),null);
             }
                 if (users.size()==1){
-                    event.getChannel().sendMessageAsync("Hunter name: **__"+event.getJDA().getUserById(found.UserID).getUsername()+"__** (Rank `"+found.rank
-                            +"`)\nRoles: "+found.Roles
-                            +"\nWeapons: "+found.Weapons,null);
+                    event.getChannel().sendMessageAsync(msg.info.GetProfileInfo(event.getJDA().getUserById(found.GetUserID()).getUsername(), found),null);
                     return;
 
                 }
             } catch(Exception e){
-                event.getChannel().sendMessageAsync("hunter may have corrupted data, please let @pikk know so he may try to fix his dumb error",null);
+                //event.getChannel().sendMessageAsync(msg.error.CorruptedProfile(),null);
                 System.out.println("error with: " +users.get(0).getId());
                 //System.out.println(event.getJDA().getUserById(Profiles.getInstance().getProfile(users.get(0).getId()).UserID).getUsername());
             }
-            event.getChannel().sendMessageAsync("I found "+users.size()+" hunters, be more specific please!",null);
+            event.getChannel().sendMessageAsync(msg.error.MultipleUsersFound(users.size()),null);
             return;
         }
                 
@@ -163,12 +125,9 @@ List<Merc> mercList = new ArrayList<>();
         else if (message.toLowerCase().startsWith("/neko") || message.toLowerCase().startsWith("%neko")){
             Profile profile = Profiles.getInstance().getProfile(event.getAuthor().getId());
             if (profile==null){
-            event.getChannel().sendMessageAsync("Nya **__"+event.getAuthorName()+"__**!\n"
-                    + "if you were looking to talk to me, simply call me with \"/neko\" and I will help you from there."
-                    + "",null);
+            event.getChannel().sendMessageAsync(msg.general.UsageReminder(event.getAuthorName()),null);
             }else{
-                event.getChannel().sendMessageAsync("Nya **__"+event.getAuthorName()+"__**!\n Nice to see you again!"
-                        + "", null);
+                event.getChannel().sendMessageAsync("Nya **__"+event.getAuthorName()+"__**!\n Nice to see you again!", null);
                 event.getAuthor().getPrivateChannel().sendMessageAsync("how can I help you?",null);
             }
         }
@@ -188,43 +147,43 @@ List<Merc> mercList = new ArrayList<>();
                 Profiles.getInstance().set(new String[] {event.getAuthor().getId(),"","","1"});
                 
                 //event.getChannel().sendMessageAsync("Nya **__"+event.getAuthorName()+"__**! check your meowssages to fill your guild card info to start having a Nekool time.", null);
-                event.getAuthor().getPrivateChannel().sendMessageAsync(helpMessage1,null);
-                event.getAuthor().getPrivateChannel().sendMessageAsync(helpMessage2,null);
+                event.getAuthor().getPrivateChannel().sendMessageAsync(msg.info.helpMessage1,null);
+                event.getAuthor().getPrivateChannel().sendMessageAsync(msg.info.helpMessage2,null);
                 return;
         }
         
         String message = event.getMessage().getRawContent();
         if (message.equalsIgnoreCase("help")){
-            event.getChannel().sendMessageAsync(helpMessage1, null);
-            event.getChannel().sendMessageAsync(helpMessage2, null);
+            event.getChannel().sendMessageAsync(msg.info.helpMessage1, null);
+            event.getChannel().sendMessageAsync(msg.info.helpMessage2, null);
         }
         
         else if(message.toLowerCase().startsWith("lookup ")){
             String name = message.substring(7);
             List<User> users = findUsers(name, event.getJDA().getGuildById("120889695658967041"));
             if (users.isEmpty()){
-                event.getChannel().sendMessageAsync("I couldnt find any hunters with that name!",null);
+                event.getChannel().sendMessageAsync(msg.error.NameNotFound(),null);
                 return;
             }
             try{
             Profile found = Profiles.getInstance().getProfile(users.get(0).getId());
-            if(event.getJDA().getUserById(found.UserID)==null){
-                event.getChannel().sendMessageAsync("User is no longer in the guild.",null);
+            if(event.getJDA().getUserById(found.GetUserID())==null){
+                event.getChannel().sendMessageAsync(msg.error.UserLeftServer(),null);
             }
+            
                 if (users.size()==1){
-                    event.getChannel().sendMessageAsync("Hunter name: **__"+event.getJDA().getUserById(found.UserID).getUsername()+"__** (Rank `"+found.rank
-                            +"`)\nRoles: "+found.Roles
-                            +"\nWeapons: "+found.Weapons,null);
+                    event.getChannel().sendMessageAsync(msg.info.GetProfileInfo(event.getJDA().getUserById(found.GetUserID()).getUsername(), found),null);
                     return;
-                
                 }
+                
             } catch(Exception e){
-                event.getChannel().sendMessageAsync("hunter may have corrupted data, please let @pikk know so he may try to fix his dumb error",null);
+                //event.getChannel().sendMessageAsync("hunter may have corrupted data, please let @pikk know so he may try to fix his dumb error",null);
                 System.out.println("error with: " +users.get(0).getId());
                 //System.out.println(event.getJDA().getUserById(Profiles.getInstance().getProfile(users.get(0).getId()).UserID).getUsername());
             }
-            event.getChannel().sendMessageAsync("I found "+users.size()+" hunters, be more specific please!",null);
+            event.getChannel().sendMessageAsync(msg.error.MultipleUsersFound(users.size()),null);
             return;
+            
         }
         
         else if(message.toLowerCase().startsWith("add ")){
@@ -233,7 +192,7 @@ List<Merc> mercList = new ArrayList<>();
                 if (message.toLowerCase().endsWith(str.toLowerCase())){
                     p.addWeapon(str);
                     Profiles.getInstance().setProfile(p);
-                    event.getChannel().sendMessageAsync("Nyokay! "+str+" has been added to your weapons!",null);
+                    event.getChannel().sendMessageAsync(msg.success.WeaponAdded(str),null);
                     return;
                 }
             }
@@ -242,31 +201,31 @@ List<Merc> mercList = new ArrayList<>();
                 if (message.toLowerCase().endsWith(str.toLowerCase())){
                     p.addRole(str);
                     Profiles.getInstance().setProfile(p);
-                    event.getChannel().sendMessageAsync("Nyokay! "+str+" has been added to your roles!",null);
+                    event.getChannel().sendMessageAsync(msg.success.RoleAdded(str),null);
                     return;
                 }
             }
             
-            event.getChannel().sendMessageAsync("Sorry, I could Moewnt find a role or weapon with that name. do you want to see \"roles\" or \"weapons\"?",null);
+            event.getChannel().sendMessageAsync(msg.error.InvalidRoleOrWeapon(),null);
             
         }
         
         else if(message.toLowerCase().startsWith("remove ")){
             //remove a thing
-            for(String str : p.Weapons){
+            for(String str : p.GetWeaponList()){
                 if (message.toLowerCase().endsWith(str.toLowerCase())){
                     p.removeWeapon(str);
                     Profiles.getInstance().setProfile(p);
-                    event.getChannel().sendMessageAsync("Nyokay! "+str+" has been removed!",null);
+                    event.getChannel().sendMessageAsync(msg.success.WeaponRemoved(str),null);
                     return;
                 }
             }
             
-            for(String str : p.Roles){
+            for(String str : p.GetRoleList()){
                 if (message.toLowerCase().endsWith(str.toLowerCase())){
                     p.removeRole(str);
                     Profiles.getInstance().setProfile(p);
-                    event.getChannel().sendMessageAsync("Nyokay! "+str+" has been removed!",null);
+                    event.getChannel().sendMessageAsync(msg.success.RoleRemoved(str),null);
                     return;
                 }
             }
@@ -277,51 +236,40 @@ List<Merc> mercList = new ArrayList<>();
         
         else if(message.equalsIgnoreCase("roles")){
             //list roles
-            String s = "recognized Meownster Hunter Roles:\n";
-            for(String str : Roles){
-                s+=str+"\n";
-            }
-            event.getChannel().sendMessageAsync(s,null);
+            event.getChannel().sendMessageAsync(msg.info.RecognizedRoles(Roles),null);
         }
         
         else if(message.equalsIgnoreCase("myRoles")){
             //list users roles
-            String s="These are your current Roles:\n";
-            s = p.Roles.stream().map((str) -> str+"\n").reduce(s, String::concat);
-            event.getChannel().sendMessageAsync(s,null);
+            event.getChannel().sendMessageAsync(msg.info.UserRoles(p),null);
         }
         
         else if(message.equalsIgnoreCase("myWeapons")){
             //list weapons
-            String s="These are your current Weapons:\n";
-            s = p.Weapons.stream().map((str) -> str+"\n").reduce(s, String::concat);
-            event.getChannel().sendMessageAsync(s,null);
+            event.getChannel().sendMessageAsync(msg.info.UserWeapons(p),null);
         }
         
         else if(message.equalsIgnoreCase("weapons")){
-            String s = "Meownster Hunter Weapons:\n";
-            for(String str : Weapons){
-                s+=str+"\n";
-            }
-            s+="prowler is my favorite!";
-            event.getChannel().sendMessageAsync(s,null);
+            event.getChannel().sendMessageAsync(msg.info.RecognizedWeapons(Weapons),null);
         }
         
         else if(message.equalsIgnoreCase("myRank")){
             //display users rank
-            event.getChannel().sendMessageAsync("you are Rank "+Integer.toString(p.rank),null);
+            event.getChannel().sendMessageAsync(msg.info.UserRank(p),null);
         }
         
         else if(message.equalsIgnoreCase("rankUp")){
-            if (p.rank==999){
-                event.getChannel().sendMessageAsync("look who thinks he is a wise cat!",null);
+            if (p.GetHunterRank().GetRank()==999){
+                event.getChannel().sendMessageAsync(msg.response.WiseCat(),null);
                 return;
             }
-            p.rank++;
-            event.getChannel().sendMessageAsync("NYATTAA! you are rank "+Integer.toString(p.rank)+" now!",null);
+            p.GetHunterRank().RankUp();
+            event.getChannel().sendMessageAsync(msg.success.HunterRankUp(p),null);
             Profiles.getInstance().setProfile(p);
-            event.getJDA().getUserById("135251434445733888").getPrivateChannel().sendMessageAsync(event.getAuthor().getId()+":"+Integer.toString(p.rank),null);
+            //send message to spectra for rank up
+            event.getJDA().getUserById("135251434445733888").getPrivateChannel().sendMessageAsync(event.getAuthor().getId()+":"+Integer.toString(p.GetHunterRank().GetRank()),null);
             //add one to rank
+            
         }
         
         else if(message.toLowerCase().startsWith("changerank ")){
@@ -330,15 +278,16 @@ List<Merc> mercList = new ArrayList<>();
             try {
                 int newRank=Integer.parseInt(newInt);
                 if (newRank<0 || newRank>999){
-                    event.getChannel().sendMessageAsync("look who thinks he is a wise cat!",null);
+                    event.getChannel().sendMessageAsync(msg.response.WiseCat(),null);
                     return;
                 }
-                p.rank=newRank;
-                event.getChannel().sendMessageAsync("I changed your rank to "+Integer.toString(p.rank)+"",null);
+                p.GetHunterRank().SetRank(newRank);
+                event.getChannel().sendMessageAsync(msg.success.HunterRankChanged(p),null);
                 Profiles.getInstance().setProfile(p);
-                event.getJDA().getUserById("135251434445733888").getPrivateChannel().sendMessageAsync(event.getAuthor().getId()+":"+Integer.toString(p.rank),null);
+                //send message to spectra for rank up
+                event.getJDA().getUserById("135251434445733888").getPrivateChannel().sendMessageAsync(event.getAuthor().getId()+":"+Integer.toString(p.GetHunterRank().GetRank()),null);
             } catch (Exception e){
-                event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number next time.",null);
+                event.getChannel().sendMessageAsync(msg.error.NotANumber(),null);
             }
         }
         
@@ -351,11 +300,11 @@ List<Merc> mercList = new ArrayList<>();
         
         else if(message.toLowerCase().startsWith("enlist leader ")){
             if(getLeaderObj(event.getAuthor().getId())!=null){
-                event.getChannel().sendMessageAsync("you are already enlisted as a Leader, use `delist` to unlist yourself before enlisting again",null);
+                event.getChannel().sendMessageAsync(msg.error.AlreadyEnlisted(true),null);
                 return;
             }
             if(getMercObj(event.getAuthor().getId())!=null){
-                event.getChannel().sendMessageAsync("you are already enlisted as a Mercenary, use `delist` to unlist yourself before enlisting again",null);
+                event.getChannel().sendMessageAsync(msg.error.AlreadyEnlisted(true),null);
                 return;
             }
             String[] strings = message.split(" ");
@@ -366,8 +315,8 @@ List<Merc> mercList = new ArrayList<>();
             }
             try{
                 thisHuntRank=Integer.parseInt(strings[4]);
-                if (thisHuntRank<1 || thisHuntRank>p.rank){
-                    event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number between 1 and your current rank(`"+p.rank+"`).",null);
+                if (thisHuntRank<1 || thisHuntRank>p.GetHunterRank().GetRank()){
+                    event.getChannel().sendMessageAsync(msg.error.InvalidHuntRank(p, false),null);
                     return;
                 }
             }catch(Exception e){
@@ -375,17 +324,17 @@ List<Merc> mercList = new ArrayList<>();
                     if(strings[4].toLowerCase().charAt(0)=='d'){//deviant hunt search
                         thisHuntRank=Integer.parseInt(strings[4].substring(1));//number past the d
                         if (thisHuntRank<1 || thisHuntRank>10){
-                            event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number between 1 and 10.",null);
+                            event.getChannel().sendMessageAsync(msg.error.InvalidHuntRank(p, true),null);
                         }
                         Leader you = new Leader(p, thisHuntRank, s, strings[2], strings[3], true);
                         leaderList.add(you);
-                        event.getChannel().sendMessageAsync("I have listed you as a leader! search for hunters!",null);
+                        event.getChannel().sendMessageAsync(msg.success.Enlisted(true),null);
                     }else{
-                        event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number between 1 and your current rank(`"+p.rank+"`).",null);
+                        event.getChannel().sendMessageAsync(msg.error.InvalidHuntRank(p, true),null);
                     }
                     return;
                 }catch(Exception ee){
-                    event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number between 1 and your current rank(`"+p.rank+"`).",null);
+                    event.getChannel().sendMessageAsync(msg.error.InvalidHuntRank(p, false),null);
                     return;
                 }
             }
@@ -397,11 +346,11 @@ List<Merc> mercList = new ArrayList<>();
         
         else if(message.toLowerCase().startsWith("enlist merc ")){
             if(getLeaderObj(event.getAuthor().getId())!=null){
-                event.getChannel().sendMessageAsync("you are already enlisted as a Leader, use `delist` to unlist yourself before enlisting again",null);
+                event.getChannel().sendMessageAsync(msg.error.AlreadyEnlisted(true),null);
                 return;
             }
             if(getMercObj(event.getAuthor().getId())!=null){
-                event.getChannel().sendMessageAsync("you are already enlisted as a Mercenary, use `delist` to unlist yourself before enlisting again",null);
+                event.getChannel().sendMessageAsync(msg.error.AlreadyEnlisted(false),null);
                 return;
             }
             String[] strings = message.split(" ");
@@ -413,29 +362,29 @@ List<Merc> mercList = new ArrayList<>();
             int rank;
             try {
                 rank=Integer.parseInt(strings[2]);
-                if (rank<1 || rank>p.rank){
-                    event.getChannel().sendMessageAsync("you can only join hunts from rank `1` to `"+p.rank+"`, sorry \uD83D\uDE3F",null);
+                if (rank<1 || rank>p.GetHunterRank().GetRank()){
+                    event.getChannel().sendMessageAsync(msg.error.InsufficientHunterRank(p),null);
                     return;
                 }
                 Merc you = new Merc(p, rank, s, false);
                 mercList.add(you);
-                event.getChannel().sendMessageAsync("I have listed you as a Mercenary! search for hunter groups!",null);
+                event.getChannel().sendMessageAsync(msg.success.Enlisted(false),null);
             } catch (Exception e){
                 try{
                     if(strings[2].toLowerCase().charAt(0)=='d'){//deviant hunt search
                         rank=Integer.parseInt(strings[2].substring(1));//number past the d
                         if (rank<1 || rank>10){
-                            event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number between 1 and 10 for deviant hunts.",null);
+                            event.getChannel().sendMessageAsync(msg.error.InvalidHuntRank(p, true),null);
                         }
                         Merc you = new Merc(p, rank, s, true);
                         mercList.add(you);
                     }else{
-                        event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number between 1 and your current rank(`"+p.rank+"`).",null);
+                        event.getChannel().sendMessageAsync(msg.error.InvalidHuntRank(p, false),null);
                     }
-                    event.getChannel().sendMessageAsync("I have listed you as a Mercenary! search for hunter groups!",null);
+                    event.getChannel().sendMessageAsync(msg.success.Enlisted(false),null);
                     return;
                 }catch(Exception ee){
-                    event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number between 1 and your current rank(`"+p.rank+"`).",null);
+                    event.getChannel().sendMessageAsync(msg.error.InvalidHuntRank(p, false),null);
                     return;
                 }
             }
@@ -447,23 +396,22 @@ List<Merc> mercList = new ArrayList<>();
             Leader lead = getLeaderObj(event.getAuthor().getId());
             if (lead != null){
                 leaderList.remove(lead);
-                event.getChannel().sendMessageAsync("I have removed you from active leaders, I hope you had a meowvelous hunt.",null);
+                event.getChannel().sendMessageAsync(msg.success.Delisted(true),null);
                 return;
             }
             
             Merc merc = getMercObj(event.getAuthor().getId());
             if (merc != null){
                 mercList.remove(merc);
-                event.getChannel().sendMessageAsync("I have removed you from active Mercenaries, I hope you had a meowvelous hunt.",null);
+                event.getChannel().sendMessageAsync(msg.success.Delisted(false),null);
                 return;
             }
-            event.getChannel().sendMessageAsync("You were not enlisted in the first place, bakka.",null);
+            event.getChannel().sendMessageAsync(msg.error.AlreadyDelisted(),null);
         }
         
         else if(message.equalsIgnoreCase("hunters")){
             purgeLists(event.getJDA());
-            event.getChannel().sendMessageAsync("there are "+Integer.toString(leaderList.size())+" leaders and "
-                    + Integer.toString(mercList.size())+" mercenaries",null);
+            event.getChannel().sendMessageAsync(msg.info.ListHuntersInQueue(leaderList.size(), mercList.size()),null);
         }
         
         else{//need to be a leader or mercenary to get this far, or its an error which is handled at the end
@@ -473,33 +421,28 @@ List<Merc> mercList = new ArrayList<>();
             Merc merc=null;
             boolean isMerc=false;
             for(Leader lead : leaderList){
-                if(p.UserID.equals(lead.profile.UserID)){
+                if(p.GetUserID().equals(lead.GetProfile().GetUserID())){
                     isLeader=true;
                     leader=lead;
                     leader.now=OffsetDateTime.now();
                     if(message.equalsIgnoreCase("filters")){
-                        String s="These are the filters Leaders can use\n";
-                        for(String str : LeaderFilters){
-                            s+=str+"\n";
-                        }
-                        event.getChannel().sendMessageAsync(s,null);
+                        event.getChannel().sendMessageAsync(msg.info.FiltersAvailable(leaderFilters, isLeader),null);
                         return;
                     }
                     break;
                 }
             }
+            
+            //
+            
             if(!isLeader){
                 for(Merc mercen : mercList){
-                    if(p.UserID.equals(mercen.profile.UserID)){
+                    if(p.GetUserID().equals(mercen.GetProfile().GetUserID())){
                         isMerc=true;
                         merc=mercen;
                         merc.now=OffsetDateTime.now();
                         if(message.equalsIgnoreCase("filters")){
-                        String s="These are the filters Mercenaries can use\n";
-                        for(String str : MercFilters){
-                            s+=str+"\n";
-                        }
-                        event.getChannel().sendMessageAsync(s,null);
+                        event.getChannel().sendMessageAsync(msg.info.FiltersAvailable(mercFilters, isLeader),null);
                         return;
                         }
                         break;
@@ -528,10 +471,7 @@ List<Merc> mercList = new ArrayList<>();
                             }else{
                                 //can be added(will use more search parameters later)
                                 leader.mercList.add(mercen);
-                                mercs+=Integer.toString(number)+". **__"+event.getJDA().getUserById(mercen.profile.UserID).getUsername()
-                                        +"__** (Hunter rank: `"+Integer.toString(mercen.profile.rank)
-                                        +"`)\n     Hunt rank: `"+Integer.toString(mercen.huntRank)
-                                        +"`  Description: "+mercen.hunting+"\n";
+                                mercs+=msg.info.MercListing(number, event.getJDA().getUserById(mercen.GetProfile().GetUserID()).getUsername(), mercen);
                                 number++;
                             }
                         }
@@ -542,19 +482,16 @@ List<Merc> mercList = new ArrayList<>();
                         mercList.remove(mercen);
                     }
                     if (mercs.equals("")){
-                        event.getChannel().sendMessageAsync("I could meownt find any hunters like that.",null);
+                        event.getChannel().sendMessageAsync(msg.error.NoSearchResult(),null);
                         return;
                     }
-                    String sendme = mercs
-                        + "`ask <X>` - asks a Hunter by number on your most recent search to join your room, or invite you to their room\n"
-                        + "\ndid you find what you were looking for? here are some command remeownders :D\n"
-                        + "`filters` - lists all filters that you can currently use to find Hunters.\n"
-                        + "`addFilter <filter> <X>` - filters hunters with X\n"
-                        + "`removeFilter <filter>` - clears that filter field\n";
+                    String sendme = mercs + msg.response.RoomListAppendix();
                     ArrayList<String> messages = splitMessage(sendme);
+                    
                     for(String s:messages){
                         event.getChannel().sendMessageAsync(s,null);
                     }
+                    
                     return;
                 }
                 

@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class Merc {
     private Profile profile;
-    int huntRank=0;
+    private int huntRank=0;
     String hunting="";
     String huntType="";
     
@@ -87,5 +87,15 @@ public class Merc {
     public void SetHuntGoal(String goal)
     {
         hunting = goal;
+    }
+    
+    public int GetHuntRank()
+    {
+        return huntRank;
+    }
+    
+    public void SetHuntRank(int huntRank)
+    {
+        this.huntRank = huntRank;
     }
 }

@@ -1,6 +1,7 @@
 package neko.Messages;
 
 import neko.Leader;
+import neko.Merc;
 import neko.Messages.Logic.StringOperations;
 import neko.Profile;
 import neko.Room;
@@ -57,12 +58,20 @@ public class Information
         return "There are "+Integer.toString(leaders)+" leaders and "+Integer.toString(mercs)+" mercenaries";
     }
 
-    public String RoomListing(int number, String user, Profile profile, Room room)
+    public String LeaderListing(int number, String user, Leader lead)
     {
         return  Integer.toString(number)+". **__"+user
-                +"__** (Hunter rank: `"     + Integer.toString(profile.GetHunterRank().GetRank())
-                +"`)\n     Hunt rank: `"    + Integer.toString(room.GetHunt().GetHuntRank())
-                +"`  Description: "         + room.GetDescription()+"\n";
+                +"__** (Hunter rank: `"     + Integer.toString(lead.GetProfile().GetHunterRank().GetRank())
+                +"`)\n     Hunt rank: `"    + Integer.toString(lead.GetRoom().GetHunt().GetHuntRank())
+                +"`  Description: "         + lead.GetRoom().GetDescription()+"\n";
+    }
+    
+    public String MercListing(int number, String user, Merc merc)
+    {
+        return  Integer.toString(number)+". **__"+user
+                +"__** (Hunter rank: `"     + Integer.toString(merc.GetProfile().GetHunterRank().GetRank())
+                +"`)\n     Hunt rank: `"    + Integer.toString(merc.GetHuntRank())
+                +"`  Description: "         + merc.GetHuntGoal()+"\n";
     }
 
     public String GetRoomInfo(String name, Leader leader)

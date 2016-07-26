@@ -48,10 +48,10 @@ public class Profiles extends DataSource{
         for(String str : p.GetWeaponList()){
             weap+=str+" ";
         }
-        for(String str : p.Roles){
+        for(String str : p.GetRoleList()){
             roles+=str+" ";
         }
-        String[] profile = {p.GetUserID(), weap, roles, Integer.toString(p.rank.GetRank()) };
+        String[] profile = {p.GetUserID(), weap, roles, Integer.toString(p.GetHunterRank().GetRank()) };
         
         set(profile);
     }

@@ -79,7 +79,7 @@ public class Error
 
     public String AlreadyDelisted()
     {
-        return "You were not enlisted in the first place, baka.";
+        return "You were not enlisted in the first place, baka!";
     }
 
     public String NoSearchResult()
