@@ -78,4 +78,14 @@ public class Merc {
     {
         return profile;
     }
+
+    public String GetHuntGoal()
+    {
+        return hunting;
+    }
+
+    public void SetHuntGoal(String goal)
+    {
+        hunting = goal;
+    }
 }
