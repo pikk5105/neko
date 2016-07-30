@@ -37,7 +37,7 @@ public class Neko extends ListenerAdapter{
     private final List<String> modIDs = new ArrayList<>();
     // info.getModIDs();
     private String token = "";
-    
+
     private void SetToken()
     {
         token = "";
@@ -149,12 +149,18 @@ public class Neko extends ListenerAdapter{
     }
 
     @Override
-    public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
-        if(event.getAuthor().isBot()){
+    public void onPrivateMessageReceived(PrivateMessageReceivedEvent event)
+    {
+
+        boolean isBot = event.getAuthor().isBot();
+        if(isBot)
+        {
             return;
         }
+
         Profile p=Profiles.getInstance().getProfile(JDAHelper.GetAuthorID(event));
-        if (p==null){
+        if (p==null)
+        {
             //make profile
             Profiles.getInstance().set(new String[] {JDAHelper.GetAuthorID(event),"","","1"});
 
@@ -170,25 +176,32 @@ public class Neko extends ListenerAdapter{
             JDAHelper.Respond(event, msg.info.helpMessage2);
         }
 
-        else if(message.toLowerCase().startsWith("lookup ")){
+        else if(message.toLowerCase().startsWith("lookup "))
+        {
             String name = message.substring(7);
             List<User> users = findUsers(name, JDAHelper.GetMHGH(event));
-            if (users.isEmpty()){
+            if (users.isEmpty())
+            {
                 JDAHelper.Respond(event, msg.error.NameNotFound());
                 return;
             }
-            try{
+            try
+            {
                 Profile found = Profiles.getInstance().getProfile(users.get(0).getId());
-                if(event.getJDA().getUserById(found.GetUserID())==null){
+                if(event.getJDA().getUserById(found.GetUserID())==null)
+                {
                     JDAHelper.Respond(event, msg.error.UserLeftServer());
                 }
 
-                if (users.size()==1){
+                if (users.size()==1)
+                {
                     JDAHelper.Respond(event, msg.info.GetProfileInfo(JDAHelper.GetUsername(event, found.GetUserID()), found));
                     return;
                 }
 
-            } catch(Exception e){
+            }
+            catch(Exception e)
+            {
                 //event.getChannel().sendMessageAsync("hunter may have corrupted data, please let @pikk know so he may try to fix his dumb error",null);
                 System.out.println("error with: " +users.get(0).getId());
                 //System.out.println(event.getJDA().getUserById(Profiles.getInstance().getProfile(users.get(0).getId()).UserID).getUsername());
@@ -198,10 +211,13 @@ public class Neko extends ListenerAdapter{
 
         }
 
-        else if(message.toLowerCase().startsWith("add ")){
+        else if(message.toLowerCase().startsWith("add "))
+        {
             //add a thing
-            for(String str : Weapons){
-                if (message.toLowerCase().endsWith(str.toLowerCase())){
+            for(String str : Weapons)
+            {
+                if (message.toLowerCase().endsWith(str.toLowerCase()))
+                {
                     p.addWeapon(str);
                     Profiles.getInstance().setProfile(p);
                     JDAHelper.Respond(event, msg.success.WeaponAdded(str));
@@ -209,8 +225,10 @@ public class Neko extends ListenerAdapter{
                 }
             }
 
-            for(String str : Roles){
-                if (message.toLowerCase().endsWith(str.toLowerCase())){
+            for(String str : Roles)
+            {
+                if (message.toLowerCase().endsWith(str.toLowerCase()))
+                {
                     p.addRole(str);
                     Profiles.getInstance().setProfile(p);
                     JDAHelper.Respond(event, msg.success.RoleAdded(str));
@@ -221,10 +239,13 @@ public class Neko extends ListenerAdapter{
 
         }
 
-        else if(message.toLowerCase().startsWith("remove ")){
+        else if(message.toLowerCase().startsWith("remove "))
+        {
             //remove a thing
-            for(String str : p.GetWeaponList()){
-                if (message.toLowerCase().endsWith(str.toLowerCase())){
+            for(String str : p.GetWeaponList())
+            {
+                if (message.toLowerCase().endsWith(str.toLowerCase()))
+                {
                     p.removeWeapon(str);
                     Profiles.getInstance().setProfile(p);
                     JDAHelper.Respond(event, msg.success.WeaponRemoved(str));
@@ -232,8 +253,10 @@ public class Neko extends ListenerAdapter{
                 }
             }
 
-            for(String str : p.GetRoleList()){
-                if (message.toLowerCase().endsWith(str.toLowerCase())){
+            for(String str : p.GetRoleList())
+            {
+                if (message.toLowerCase().endsWith(str.toLowerCase()))
+                {
                     p.removeRole(str);
                     Profiles.getInstance().setProfile(p);
                     JDAHelper.Respond(event, msg.success.RoleRemoved(str));
@@ -243,32 +266,39 @@ public class Neko extends ListenerAdapter{
             JDAHelper.Respond(event, msg.error.RoleOrWeaponNotFound());
         }
 
-        else if(message.equalsIgnoreCase("roles")){
+        else if(message.equalsIgnoreCase("roles"))
+        {
             //list roles
             JDAHelper.Respond(event, msg.info.RecognizedRoles(Roles));
         }
 
-        else if(message.equalsIgnoreCase("myRoles")){
+        else if(message.equalsIgnoreCase("myRoles"))
+        {
             //list users roles
             JDAHelper.Respond(event, msg.info.UserRoles(p));
         }
 
-        else if(message.equalsIgnoreCase("myWeapons")){
+        else if(message.equalsIgnoreCase("myWeapons"))
+        {
             //list weapons
             JDAHelper.Respond(event,msg.info.UserWeapons(p));
         }
 
-        else if(message.equalsIgnoreCase("weapons")){
+        else if(message.equalsIgnoreCase("weapons"))
+        {
             JDAHelper.Respond(event, msg.info.RecognizedWeapons(Weapons));
         }
 
-        else if(message.equalsIgnoreCase("myRank")){
+        else if(message.equalsIgnoreCase("myRank"))
+        {
             //display users rank
             JDAHelper.Respond(event, msg.info.UserRank(p));
         }
 
-        else if(message.equalsIgnoreCase("rankUp")){
-            if (p.GetHunterRank().GetRank()==999){
+        else if(message.equalsIgnoreCase("rankUp"))
+        {
+            if (p.GetHunterRank().GetRank()==999)
+            {
                 JDAHelper.Respond(event, msg.response.WiseCat());
                 return;
             }
@@ -282,12 +312,15 @@ public class Neko extends ListenerAdapter{
 
         }
 
-        else if(message.toLowerCase().startsWith("changerank ")){
+        else if(message.toLowerCase().startsWith("changerank "))
+        {
             //changes rank to X
             String newInt=message.substring(11);
-            try {
+            try
+            {
                 int newRank=Integer.parseInt(newInt);
-                if (newRank<0 || newRank>999){
+                if (newRank<0 || newRank>999)
+                {
                     JDAHelper.Respond(event, msg.response.WiseCat());
                     return;
                 }
@@ -296,19 +329,23 @@ public class Neko extends ListenerAdapter{
                 Profiles.getInstance().setProfile(p);
                 //send message to spectra for rank up
                 SpectraHelper.RankUpdateEvent(event, p);
-            } catch (Exception e){
+            }
+            catch (Exception e)
+            {
                 JDAHelper.Respond(event, msg.error.NotANumber());
             }
         }
 
-        else if(message.equalsIgnoreCase("/shutdown")&&modIDs.contains(JDAHelper.GetAuthorID(event))){
+        else if(message.equalsIgnoreCase("/shutdown")&&modIDs.contains(JDAHelper.GetAuthorID(event)))
+        {
             JDAHelper.Message(event, "Aye Sir!");
             JDAHelper.Shutdown(event);
             Profiles.getInstance().shutdown();
 
         }
 
-        else if(message.toLowerCase().startsWith("enlist leader ")){
+        else if(message.toLowerCase().startsWith("enlist leader "))
+        {
             if(getLeaderObj(JDAHelper.GetAuthorID(event))!=null){
                 JDAHelper.Respond(event,msg.error.AlreadyEnlisted(true));
                 return;
@@ -320,124 +357,154 @@ public class Neko extends ListenerAdapter{
             String[] strings = message.split(" ");
             int thisHuntRank=0;
             String s="";
-            for(int i=5; i<strings.length; i++){
+            for(int i=5; i<strings.length; i++)
+            {
                 s+=strings[i]+" ";
             }
-            try{
+            try
+            {
                 thisHuntRank=Integer.parseInt(strings[4]);
-                if (thisHuntRank<1 || thisHuntRank>p.GetHunterRank().GetRank()){
+                if (thisHuntRank<1 || thisHuntRank>p.GetHunterRank().GetRank())
+                {
                     JDAHelper.Respond(event, msg.error.InvalidHuntRank(p, false));
                     return;
                 }
-            }catch(Exception e){
-                try{
-                    if(strings[4].toLowerCase().charAt(0)=='d'){//deviant hunt search
+            }
+            catch(Exception e)
+            {
+                try
+                {
+                    if(strings[4].toLowerCase().charAt(0)=='d')
+                    {//deviant hunt search
                         thisHuntRank=Integer.parseInt(strings[4].substring(1));//number past the d
-                        if (thisHuntRank<1 || thisHuntRank>10){
+                        if (thisHuntRank<1 || thisHuntRank>10)
+                        {
                             event.getChannel().sendMessageAsync(msg.error.InvalidHuntRank(p, true),null);
                         }
                         Leader you = new Leader(p, thisHuntRank, s, strings[2], strings[3], true);
                         leaderList.add(you);
                         event.getChannel().sendMessageAsync(msg.success.Enlisted(true),null);
-                    }else{
+                    }
+                    else
+                    {
                         event.getChannel().sendMessageAsync(msg.error.InvalidHuntRank(p, true),null);
                     }
                     return;
-                }catch(Exception ee){
+                }
+                catch(Exception ee)
+                {
                     event.getChannel().sendMessageAsync(msg.error.InvalidHuntRank(p, false),null);
                     return;
                 }
             }
             Leader you = new Leader(p, thisHuntRank, s, strings[2], strings[3], false);
             leaderList.add(you);
-            event.getChannel().sendMessageAsync("I have listed you as a leader! search for hunters!",null);
-
+            JDAHelper.Respond(event, msg.success.Enlisted(true));
         }
 
-        else if(message.toLowerCase().startsWith("enlist merc ")){
-            if(getLeaderObj(event.getAuthor().getId())!=null){
-                event.getChannel().sendMessageAsync(msg.error.AlreadyEnlisted(true),null);
+        else if(message.toLowerCase().startsWith("enlist merc "))
+        {
+            if(getLeaderObj(JDAHelper.GetAuthorID(event))!=null)
+            {
+                JDAHelper.Respond(event, msg.error.AlreadyEnlisted(true));
                 return;
             }
-            if(getMercObj(event.getAuthor().getId())!=null){
-                event.getChannel().sendMessageAsync(msg.error.AlreadyEnlisted(false),null);
+            if(getMercObj(event.getAuthor().getId())!=null)
+            {
+                JDAHelper.Respond(event, msg.error.AlreadyEnlisted(false));
                 return;
             }
             String[] strings = message.split(" ");
 
             String s="";
-            for(int i=3; i<strings.length; i++){
+            for(int i=3; i<strings.length; i++)
+            {
                 s+=strings[i]+" ";
             }
             int rank;
             try {
                 rank=Integer.parseInt(strings[2]);
-                if (rank<1 || rank>p.GetHunterRank().GetRank()){
-                    event.getChannel().sendMessageAsync(msg.error.InsufficientHunterRank(p),null);
+                if (rank<1 || rank>p.GetHunterRank().GetRank())
+                {
+                    JDAHelper.Respond(event, msg.error.InsufficientHunterRank(p));
                     return;
                 }
                 Merc you = new Merc(p, rank, s, false);
                 mercList.add(you);
-                event.getChannel().sendMessageAsync(msg.success.Enlisted(false),null);
-            } catch (Exception e){
-                try{
-                    if(strings[2].toLowerCase().charAt(0)=='d'){//deviant hunt search
+                JDAHelper.Respond(event, msg.success.Enlisted(false));
+            } catch (Exception e)
+            {
+                try
+                {
+                    if(strings[2].toLowerCase().charAt(0)=='d') //deviant hunt search
+                    {
                         rank=Integer.parseInt(strings[2].substring(1));//number past the d
-                        if (rank<1 || rank>10){
-                            event.getChannel().sendMessageAsync(msg.error.InvalidHuntRank(p, true),null);
+                        if (rank<1 || rank>10)
+                        {
+                            JDAHelper.Respond(event, msg.error.InvalidHuntRank(p, true));
                         }
                         Merc you = new Merc(p, rank, s, true);
                         mercList.add(you);
-                    }else{
-                        event.getChannel().sendMessageAsync(msg.error.InvalidHuntRank(p, false),null);
                     }
-                    event.getChannel().sendMessageAsync(msg.success.Enlisted(false),null);
+                    else
+                    {
+                        JDAHelper.Respond(event, msg.error.InvalidHuntRank(p, false));
+                    }
+                    JDAHelper.Respond(event, msg.success.Enlisted(false));
                     return;
-                }catch(Exception ee){
-                    event.getChannel().sendMessageAsync(msg.error.InvalidHuntRank(p, false),null);
+                }
+                catch(Exception ee)
+                {
+                    JDAHelper.Respond(event, msg.error.InvalidHuntRank(p, false));
                     return;
                 }
             }
 
         }
 
-        else if(message.equalsIgnoreCase("delist")){
+        else if(message.equalsIgnoreCase("delist"))
+        {
 
             Leader lead = getLeaderObj(event.getAuthor().getId());
-            if (lead != null){
+            if (lead != null)
+            {
                 leaderList.remove(lead);
-                event.getChannel().sendMessageAsync(msg.success.Delisted(true),null);
+                JDAHelper.Respond(event, msg.success.Delisted(true));
                 return;
             }
 
             Merc merc = getMercObj(event.getAuthor().getId());
-            if (merc != null){
+            if (merc != null)
+            {
                 mercList.remove(merc);
-                event.getChannel().sendMessageAsync(msg.success.Delisted(false),null);
+                JDAHelper.Respond(event, msg.success.Delisted(false));
                 return;
             }
-            event.getChannel().sendMessageAsync(msg.error.AlreadyDelisted(),null);
+            JDAHelper.Respond(event, msg.error.AlreadyDelisted());
         }
 
-        else if(message.equalsIgnoreCase("hunters")){
+        else if(message.equalsIgnoreCase("hunters"))
+        {
             purgeLists(event.getJDA());
-            event.getChannel().sendMessageAsync(msg.info.ListHuntersInQueue(leaderList.size(), mercList.size()),null);
+            JDAHelper.Respond(event, msg.info.ListHuntersInQueue(leaderList.size(), mercList.size()));
         }
 
-        else{//need to be a leader or mercenary to get this far, or its an error which is handled at the end
-
+        else   //need to be a leader or mercenary to get this far, or its an error which is handled at the end
+        {
             boolean isLeader=false;
             Leader leader=null;
             Merc merc=null;
             boolean isMerc=false;
-            for(Leader lead : leaderList){
-                if(p.GetUserID().equals(lead.GetProfile().GetUserID())){
+            for(Leader lead : leaderList)
+            {
+                if(p.GetUserID().equals(lead.GetProfile().GetUserID()))
+                {
                     isLeader=true;
                     leader=lead;
                     leader.now=OffsetDateTime.now();
-                    if(message.equalsIgnoreCase("filters")){
-                        event.getChannel().sendMessageAsync(msg.info.FiltersAvailable(leaderFilters, isLeader),null);
-                        return;
+                    if(message.equalsIgnoreCase("filters"))
+                    {
+                        JDAHelper.Respond(event, msg.info.FiltersAvailable(leaderFilters, isLeader));
                     }
                     break;
                 }
@@ -445,29 +512,34 @@ public class Neko extends ListenerAdapter{
 
             //
 
-            if(!isLeader){
-                for(Merc mercen : mercList){
-                    if(p.GetUserID().equals(mercen.GetProfile().GetUserID())){
+            if(!isLeader)
+            {
+                for(Merc mercen : mercList)
+                {
+                    if(p.GetUserID().equals(mercen.GetProfile().GetUserID()))
+                    {
                         isMerc=true;
                         merc=mercen;
                         merc.now=OffsetDateTime.now();
-                        if(message.equalsIgnoreCase("filters")){
-                            event.getChannel().sendMessageAsync(msg.info.FiltersAvailable(mercFilters, isLeader),null);
+                        if(message.equalsIgnoreCase("filters"))
+                        {
+                            JDAHelper.Respond(event, msg.info.FiltersAvailable(mercFilters, isLeader));
                             return;
                         }
                         break;
                     }
                 }
             }
-            else{
-                /*is a leader*/
+            else /*is a leader*/
+            {
                 if(message.equalsIgnoreCase("search")){
                     //todo: search for mercs
                     String mercs="";
                     leader.mercList.clear();
                     List<Merc> deleteList = new ArrayList<>();
                     int number = 1;
-                    for(Merc mercen: mercList){
+                    for(Merc mercen: mercList)
+                    {
                         if (((mercen.GetProfile().GetHunterRank().GetRank()<=leader.rankH
                                 && mercen.GetProfile().GetHunterRank().GetRank()>=leader.rankL)
                                 ||(mercen.GetHuntRank()<=leader.rankH && mercen.GetHuntRank()>=leader.rankL))
@@ -481,9 +553,12 @@ public class Neko extends ListenerAdapter{
                                 || leader.huntTypeSearch.equals(mercen.huntType))
                                 && mercen.requestFrom==null){
                             //check to make sure it isnt over 12 hours old first!
-                            if(OffsetDateTime.now().isAfter(mercen.now.plusHours(4))){
+                            if(OffsetDateTime.now().isAfter(mercen.now.plusHours(4)))
+                            {
                                 deleteList.add(mercen);
-                            }else{
+                            }
+                            else
+                            {
                                 //can be added(will use more search parameters later)
                                 leader.mercList.add(mercen);
                                 mercs+=msg.info.MercListing(number, event.getJDA().getUserById(mercen.GetProfile().GetUserID()).getUsername(), mercen);
@@ -492,71 +567,85 @@ public class Neko extends ListenerAdapter{
                         }
                     }
                     //delete all over 4 hours
-                    for (Iterator<Merc> it = deleteList.iterator(); it.hasNext();) {
+                    for (Iterator<Merc> it = deleteList.iterator(); it.hasNext();)
+                    {
                         Merc mercen = it.next();
                         mercList.remove(mercen);
                     }
-                    if (mercs.equals("")){
-                        event.getChannel().sendMessageAsync(msg.error.NoSearchResult(),null);
+                    if (mercs.equals(""))
+                    {
+                        JDAHelper.Respond(event, msg.error.NoSearchResult());
                         return;
                     }
                     String sendme = mercs + msg.response.RoomListAppendix();
                     ArrayList<String> messages = splitMessage(sendme);
 
                     for(String s:messages){
-                        event.getChannel().sendMessageAsync(s,null);
+                        JDAHelper.Respond(event, s);
                     }
-
                     return;
                 }
 
-                else if(message.toLowerCase().startsWith("ask ")){
+                else if(message.toLowerCase().startsWith("ask "))
+                {
                     String[] parsedm = message.split(" ");
-                    if (parsedm.length!= 2){
-                        event.getChannel().sendMessageAsync("`ask #` will ask that person on the list to join",null);
+                    if (parsedm.length!= 2)
+                    {
+                        JDAHelper.Respond(event, msg.info.AskToJoin());
                         return;
                     }
-
-                    try{
+                    try
+                    {
                         int listIndex = Integer.parseInt(parsedm[1]);
-                        if (listIndex>leader.mercList.size() || listIndex<=0){//not a viable index
-                            event.getChannel().sendMessageAsync("use a number 1-"+Integer.toString(leader.mercList.size())+".",null);
+                        if (listIndex>leader.mercList.size() || listIndex<=0) //not a viable index
+                        {
+                            JDAHelper.Respond(event, msg.info.UseNumberRange(leader.mercList.size()));
                             return;
                         }
                         listIndex--;
                         Merc m = leader.mercList.get(listIndex);
-                        if (m.requestFrom != null){
-                            event.getChannel().sendMessageAsync("he already has a request pending from a leader, I cant ask him untill he answers that request.",null);
+                        if (m.requestFrom != null)
+                        {
+                            JDAHelper.Respond(event, msg.error.HasRequestPending());
                             return;
                         }
                         m.requestFrom=leader;
-                        event.getJDA().getUserById(m.GetProfile().GetUserID()).getPrivateChannel().sendMessageAsync("**__"+event.getJDA().getUserById(leader.GetProfile().GetUserID()).getUsername()+"__** would like you to hunt\n\""+leader.GetRoom().GetHunt().GetMonster()+"\"\nwould you like to accept? (Y/N)",null);
-                        event.getChannel().sendMessageAsync("Invitation has been sent to "+event.getJDA().getUserById(m.GetProfile().GetUserID()).getUsername(), null);
-                    }catch(Exception e){
-                        event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number next time.",null);
+                        JDAHelper.SendDMByID(event, m.GetProfile().GetUserID(), msg.response.AskHunter(JDAHelper.GetUsername(event, leader.GetProfile().GetUserID()), leader));
+                        JDAHelper.Respond(event, msg.success.HunterAsked(JDAHelper.GetUsername(event, m.GetProfile().GetUserID())));
+                    }
+                    catch(Exception e)
+                    {
+                        JDAHelper.Respond(event, msg.error.NotANumber());
                     }
                     return;
 
                 }
 
-                else if(message.toLowerCase().startsWith("slots ")){
-                    try{
+                else if(message.toLowerCase().startsWith("slots "))
+                {
+                    try
+                    {
                         int s = Integer.parseInt(message.split(" ")[1]);
-                        if (s<0||s>3){
-                            event.getChannel().sendMessageAsync("you can only have 0-3 slots for hunters not including yourself **__"+event.getJDA().getUserById(p.GetUserID()).getUsername()+"__**",null);
+                        if (s<0||s>3)
+                        {
+                            JDAHelper.Respond(event, msg.error.InvalidSlotRange(JDAHelper.GetUsername(event, p.GetUserID())));
                             return;
                         }
                         leader.slots=s;
-                        event.getChannel().sendMessageAsync("Slots in group changed to `"+leader.slots+"`",null);
-                    }catch(Exception e){
-                        event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number next time.",null);
+                        JDAHelper.Respond(event, msg.success.SlotsChanged(leader.slots));
+                    }
+                    catch(Exception e)
+                    {
+                        JDAHelper.Respond(event, msg.error.NotANumber());
                     }
                     return;
                 }
 
-                else if(message.equalsIgnoreCase("y")){
-                    if (leader.requestFrom == null){
-                        event.getChannel().sendMessageAsync("you have no requests waiting.",null);
+                else if(message.equalsIgnoreCase("y"))
+                {
+                    if (leader.requestFrom == null)
+                    {
+                        JDAHelper.Respond(event, msg.info.NoRequests());
                         return;
                     }
                     leader.slots--;
