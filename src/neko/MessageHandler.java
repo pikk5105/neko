@@ -6,7 +6,8 @@ import neko.Messages.Error;
 /**
  * Created by Dominik on 21.07.2016.
  */
-public class MessageHandler {
+public class MessageHandler
+{
     private static MessageHandler instance = new MessageHandler();
 
     public Error error;
@@ -16,18 +17,21 @@ public class MessageHandler {
     public Response response;
     public Success success;
 
-    private MessageHandler() {
+    private MessageHandler()
+    {
         init();
     }
 
-    public static MessageHandler GetInstance() {
+    public static MessageHandler GetInstance()
+    {
         if (instance == null) {
             instance = new MessageHandler();
         }
         return instance;
     }
 
-    private void init() {
+    private void init()
+    {
         error = new Error();
         general = new General();
         info = new Information();
