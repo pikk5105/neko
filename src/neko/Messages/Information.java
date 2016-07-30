@@ -4,7 +4,6 @@ import neko.Leader;
 import neko.Merc;
 import neko.Messages.Logic.StringOperations;
 import neko.Profile;
-import neko.Room;
 
 /**
  * Created by Dominik on 25.07.2016.
@@ -134,5 +133,20 @@ public class Information
             String s = "These are the filters Mercenaries can use\n";
             return StringOperations.AppendStringArray(s, filters);
         }
+    }
+
+    public String AskToJoin()
+    {
+        return "`ask #` will ask that person on the list to join";
+    }
+
+    public String UseNumberRange(int upperLimit)
+    {
+        return "Use a number between 1 - "+Integer.toString(upperLimit)+", nya!";
+    }
+
+    public String NoRequests()
+    {
+        return "You have no requests waiting, nya!";
     }
 }
