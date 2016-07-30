@@ -7,6 +7,11 @@ import neko.Profile;
  */
 public class Error
 {
+    
+    public String WrongInput(){
+        return "\uD83D\uDE40 I cant handle that right meow! \uD83D\uDE40\n"
+                    + "if you need help, just type help.";
+    }
 
     public String NotListedAsLeader()
     {

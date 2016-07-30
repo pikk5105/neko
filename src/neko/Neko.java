@@ -20,6 +20,8 @@ import net.dv8tion.jda.OnlineStatus;
 import net.dv8tion.jda.entities.Guild;
 import net.dv8tion.jda.entities.User;
 import net.dv8tion.jda.entities.impl.GuildImpl;
+import net.dv8tion.jda.events.message.GenericMessageEvent;
+import net.dv8tion.jda.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.hooks.ListenerAdapter;
@@ -57,6 +59,8 @@ public class Neko extends ListenerAdapter{
 
     List<Leader> leaderList = new ArrayList<>();
     List<Merc> mercList = new ArrayList<>();
+    
+    String atMe = ".*<@!?196047400811495424>.*";
 
     MessageHandler msg = MessageHandler.GetInstance() ;
 
@@ -143,7 +147,7 @@ public class Neko extends ListenerAdapter{
                 event.getAuthor().getPrivateChannel().sendMessageAsync("how can I help you?",null);
             }
         }
-        else if(message.matches(".*<@!?196047400811495424>.*")){
+        else if(message.matches(atMe)){
             event.getChannel().sendMessageAsync("NYA! THAT'S ME!", null);
         }
     }
@@ -536,42 +540,17 @@ public class Neko extends ListenerAdapter{
                     //todo: search for mercs
                     String mercs="";
                     leader.mercList.clear();
-                    List<Merc> deleteList = new ArrayList<>();
+                    purgeLists(event.getJDA());
                     int number = 1;
                     for(Merc mercen: mercList)
                     {
-                        if (((mercen.GetProfile().GetHunterRank().GetRank()<=leader.rankH
-                                && mercen.GetProfile().GetHunterRank().GetRank()>=leader.rankL)
-                                ||(mercen.GetHuntRank()<=leader.rankH && mercen.GetHuntRank()>=leader.rankL))
-                                && (mercen.hunting.toLowerCase().replaceAll("\\s+","").contains(leader.lookingToHunt.toLowerCase().replaceAll("\\s+",""))
-                                || leader.lookingToHunt.toLowerCase().replaceAll("\\s+","").contains(mercen.hunting.toLowerCase().replaceAll("\\s+","")))
-                                && (mercen.hasRole(leader.role)
-                                || leader.role.equals(""))
-                                && (mercen.hasWeapon(leader.weapon)
-                                || leader.weapon.equals(""))
-                                && (leader.huntTypeSearch.equals("")
-                                || leader.huntTypeSearch.equals(mercen.huntType))
-                                && mercen.requestFrom==null){
-                            //check to make sure it isnt over 12 hours old first!
-                            if(OffsetDateTime.now().isAfter(mercen.now.plusHours(4)))
-                            {
-                                deleteList.add(mercen);
-                            }
-                            else
-                            {
-                                //can be added(will use more search parameters later)
-                                leader.mercList.add(mercen);
-                                mercs+=msg.info.MercListing(number, event.getJDA().getUserById(mercen.GetProfile().GetUserID()).getUsername(), mercen);
-                                number++;
-                            }
+                        if (mercForLeader(mercen, leader)){
+                            leader.mercList.add(mercen);
+                            mercs+=msg.info.MercListing(number, event.getJDA().getUserById(mercen.GetProfile().GetUserID()).getUsername(), mercen);
+                            number++;
                         }
                     }
-                    //delete all over 4 hours
-                    for (Iterator<Merc> it = deleteList.iterator(); it.hasNext();)
-                    {
-                        Merc mercen = it.next();
-                        mercList.remove(mercen);
-                    }
+                    
                     if (mercs.equals(""))
                     {
                         JDAHelper.Respond(event, msg.error.NoSearchResult());
@@ -786,16 +765,11 @@ public class Neko extends ListenerAdapter{
                     String leaders="";
                     merc.leaderList.clear();
                     int number=1;
-                    List<Leader> deleteList = new ArrayList<>();
+                    purgeLists(event.getJDA());
                     for(Leader lead: leaderList){
-                        if (lead.slots>0 &&(merc.huntTypeSearch.equals("")
-                                || merc.huntTypeSearch.equals(lead.GetRoom().GetHunt().GetHuntType())) && ((lead.GetProfile().GetHunterRank().GetRank()<=merc.rankH && lead.GetProfile().GetHunterRank().GetRank()>=merc.rankL)
-                                || (lead.GetRoom().GetHunt().GetHuntRank()<=merc.rankH && lead.GetRoom().GetHunt().GetHuntRank()>=merc.rankL)) && (lead.GetRoom().GetHunt().GetMonster().toLowerCase().replaceAll("\\s+","").contains(merc.lookingToHunt.toLowerCase().replaceAll("\\s+",""))
-                                || (merc.lookingToHunt.toLowerCase().replaceAll("\\s+","").contains(lead.GetRoom().GetHunt().GetMonster().toLowerCase().replaceAll("\\s+","")))) && (lead.requestFrom==null)){
-                            //check to make sure it isnt over 4 hours old first!
-                            if(OffsetDateTime.now().isAfter(lead.now.plusHours(4))){
-                                deleteList.add(lead);
-                            }else{
+                        if (leaderForMerc(lead, merc)){
+
+
                                 //can be added(will use more search parameters later)
                                 merc.leaderList.add(lead);
                                 leaders+=Integer.toString(number)+".    **__"+event.getJDA().getUserById(lead.GetProfile().GetUserID()).getUsername()
@@ -803,15 +777,9 @@ public class Neko extends ListenerAdapter{
                                         +"`)\n      hunting rank: `"+Integer.toString(lead.GetRoom().GetHunt().GetHuntRank())
                                         +"`,  Description:  "+lead.GetRoom().GetDescription()+"\n";
                                 number++;
-                            }
+                            
                         }
                     }
-                    //delete all over 4 hours
-                    for (Iterator<Leader> it = deleteList.iterator(); it.hasNext();) {
-                        Leader lead = it.next();
-                        leaderList.remove(lead);
-                    }
-
 
                     if(leaders.equals("")){
                         event.getChannel().sendMessageAsync("I could Meownt find any groups like that",null);
@@ -994,13 +962,36 @@ public class Neko extends ListenerAdapter{
             }
 
 
-            event.getChannel().sendMessageAsync("\uD83D\uDE40 I cant handle that right meow! \uD83D\uDE40\n"
-                    + "if you need help, just type help.",null);
+            event.getChannel().sendMessageAsync(msg.error.WrongInput(),null);
 
         }
     }
 
 
+    public void profileLookup(String name, MessageReceivedEvent event){
+        List<User> users = findUsers(name, event.getJDA().getGuildById("120889695658967041"));
+            if (users.isEmpty()){
+                event.getChannel().sendMessageAsync(msg.error.NoSearchResult(),null);
+                return;
+            }
+            try{
+                Profile found = Profiles.getInstance().getProfile(users.get(0).getId());
+                if(event.getJDA().getUserById(found.GetUserID())==null){
+                    event.getChannel().sendMessageAsync(msg.error.UserLeftServer(),null);
+                }
+                if (users.size()==1){
+                    event.getChannel().sendMessageAsync(msg.info.GetProfileInfo(event.getJDA().getUserById(found.GetUserID()).getUsername(), found),null);
+                    return;
+
+                }
+            } catch(Exception e){
+                //event.getChannel().sendMessageAsync(msg.error.CorruptedProfile(),null);
+                System.out.println("error with: " +users.get(0).getId());
+                //System.out.println(event.getJDA().getUserById(Profiles.getInstance().getProfile(users.get(0).getId()).UserID).getUsername());
+            }
+            event.getChannel().sendMessageAsync(msg.error.MultipleUsersFound(users.size()),null);
+    }
+    
     Leader getLeaderObj(String userID){
         for(Leader lead: leaderList){
             if(lead.GetProfile().GetUserID().equals(userID)){
@@ -1105,6 +1096,33 @@ public class Neko extends ListenerAdapter{
             }
         }
         mercList.removeAll(deleteList2);
+    }
+    
+    public static boolean mercForLeader(Merc mercen, Leader leader){
+        if (((mercen.GetProfile().GetHunterRank().GetRank()<=leader.rankH && mercen.GetProfile().GetHunterRank().GetRank()>=leader.rankL) ||(mercen.GetHuntRank()<=leader.rankH && mercen.GetHuntRank()>=leader.rankL))
+                && (mercen.hunting.toLowerCase().replaceAll("\\s+","").contains(leader.lookingToHunt.toLowerCase().replaceAll("\\s+","")) || leader.lookingToHunt.toLowerCase().replaceAll("\\s+","").contains(mercen.hunting.toLowerCase().replaceAll("\\s+","")))
+                && (mercen.hasRole(leader.role) || leader.role.equals(""))
+                && (mercen.hasWeapon(leader.weapon) || leader.weapon.equals(""))
+                && (leader.huntTypeSearch.equals("") || leader.huntTypeSearch.equals(mercen.huntType))
+                && mercen.requestFrom==null)
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    public static boolean leaderForMerc(Leader lead, Merc merc)
+    {
+        if (lead.slots>0
+                && (merc.huntTypeSearch.equals("")|| merc.huntTypeSearch.equals(lead.GetRoom().GetHunt().GetHuntType()))
+                && ((lead.GetProfile().GetHunterRank().GetRank()<=merc.rankH && lead.GetProfile().GetHunterRank().GetRank()>=merc.rankL) || (lead.GetRoom().GetHunt().GetHuntRank()<=merc.rankH && lead.GetRoom().GetHunt().GetHuntRank()>=merc.rankL))
+                && (lead.GetRoom().GetHunt().GetMonster().toLowerCase().replaceAll("\\s+","").contains(merc.lookingToHunt.toLowerCase().replaceAll("\\s+","")) || (merc.lookingToHunt.toLowerCase().replaceAll("\\s+","").contains(lead.GetRoom().GetHunt().GetMonster().toLowerCase().replaceAll("\\s+",""))))
+                && (lead.requestFrom==null)){
+            return true;
+        }
+
+        
+        return false;
     }
 
     /**
