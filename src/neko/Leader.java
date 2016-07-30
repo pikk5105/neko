@@ -5,6 +5,8 @@
  */
 package neko;
 //add ask command info when the neko thing happens!
+import neko.Interfaces.IHunter;
+
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +15,10 @@ import java.util.List;
  *
  * @author Brady
  */
-public class Leader
+
+public class Leader implements IHunter
 {
-    Profile profile     = null;
+    private Profile profile     = null;
     private Room room   = null;
     private Filters filters = null;
     OffsetDateTime now  = OffsetDateTime.now();
@@ -32,28 +35,62 @@ public class Leader
     List<Merc> mercList = new ArrayList<>();    //list from search
     Merc requestFrom = null;
 
-    Leader(Profile newProfile,
-           int newHuntRank,
-           String newRoomDescription,
-           String newHallID,
-           String newPasscode,
-           boolean newIsDeviant)
+    Leader(Profile profile,
+           int huntRank,
+           String roomDescription,
+           String roomID,
+           String roomPasscode,
+           boolean isDeviantHunt)
     {
-        this.profile    = newProfile;
+        this.profile    = profile;
     }
 
+    Leader(Profile profile, Room room, Filters filters)
+    {
+        this.profile = profile;
+        this.room = room;
+        this.filters = filters;
+    }
+
+    Leader(Profile profile)
+    {
+        this.profile = profile;
+    }
+
+    @Override
+    public void SetRoom(Room r) {
+
+    }
+
+    @Override
     public Room GetRoom()
     {
         return room;
     }
 
+    @Override
     public void SetProfile(Profile profile)
     {
         this.profile = profile;
     }
 
+    @Override
     public Profile GetProfile()
     {
         return profile;
     }
+
+
+    @Override
+    public void SetFilters()
+    {
+
+    }
+
+    @Override
+    public Filters GetFilters()
+    {
+        return null;
+    }
+
 }

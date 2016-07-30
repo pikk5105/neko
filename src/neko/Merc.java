@@ -5,6 +5,8 @@
  */
 package neko;
 
+import neko.Interfaces.IHunter;
+
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,8 @@ import java.util.List;
  *
  * @author Brady
  */
-public class Merc {
+public class Merc implements IHunter
+{
     private Profile profile;
     private Room room;
     private Filters filters;
@@ -100,4 +103,6 @@ public class Merc {
     {
         this.huntRank = huntRank;
     }
+
+
 }
