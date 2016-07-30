@@ -11,6 +11,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import javax.security.auth.login.LoginException;
+
+import neko.Util.JDAHelper;
+import neko.Util.SpectraHelper;
 import net.dv8tion.jda.JDA;
 import net.dv8tion.jda.JDABuilder;
 import net.dv8tion.jda.OnlineStatus;
@@ -30,36 +33,45 @@ import net.dv8tion.jda.hooks.ListenerAdapter;
 //
 public class Neko extends ListenerAdapter{
 
-Secret info = new Secret();
-private final List<String> modIDs = info.getModIDs();
-//info.getModIDs();
-private final String token = info.getToken();
+    // Secret info = new Secret();
+    private final List<String> modIDs = new ArrayList<>();
+    // info.getModIDs();
+    private String token = "";
+    
+    private void SetToken()
+    {
+        token = "";
+    }
 
+    private void SetModIDs()
+    {
+        modIDs.add("");
+    }
 
-String[] Roles = {"Damage", "Tank", "Status", "Support", "Mounter", "Other"};
-String[] Weapons = {"GS", "LS", "SnS", "DB", "Hammer", "HH", "Lance", "GL", "SA", "CB", "IG", "LBG", "HBG", "Bow", "Prowler"};
-String[] huntTypes = {"Low", "High", "Deviant"};
+    String[] Roles = {"Damage", "Tank", "Status", "Support", "Mounter", "Other"};
+    String[] Weapons = {"GS", "LS", "SnS", "DB", "Hammer", "HH", "Lance", "GL", "SA", "CB", "IG", "LBG", "HBG", "Bow", "Prowler"};
+    String[] huntTypes = {"Low", "High", "Deviant"};
 
-String[] leaderFilters ={"Rank>", "Rank<", "Role", "Weapon", "HuntRank", "HuntType", "LookingToHunt"};
-String[] mercFilters = {"Rank>", "Rank<", "HuntRank", "HuntType", "Hunting"};
+    String[] leaderFilters ={"Rank>", "Rank<", "Role", "Weapon", "HuntRank", "HuntType", "LookingToHunt"};
+    String[] mercFilters = {"Rank>", "Rank<", "HuntRank", "HuntType", "Hunting"};
 
-List<Leader> leaderList = new ArrayList<>();
-List<Merc> mercList = new ArrayList<>();
+    List<Leader> leaderList = new ArrayList<>();
+    List<Merc> mercList = new ArrayList<>();
 
-MessageHandler msg = MessageHandler.GetInstance() ;
+    MessageHandler msg = MessageHandler.GetInstance() ;
 
-//private profiles[] profilesList; not needed
-// msg      msg.errors.InvalidHunterRank()
+    //private profiles[] profilesList; not needed
+    // msg      msg.errors.InvalidHunterRank()
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         String message = event.getMessage().getRawContent();
-        
+
         if (message.equalsIgnoreCase("/neko") || message.equalsIgnoreCase("%neko")){
             Profile profile = Profiles.getInstance().getProfile(event.getAuthor().getId());
             if (profile==null){
                 //make profile
                 Profiles.getInstance().set(new String[] {event.getAuthor().getId(),"","","1"});
-                
+
                 event.getChannel().sendMessageAsync(msg.general.NewUserGreeting(event.getAuthor().getUsername()), null);
                 event.getAuthor().getPrivateChannel().sendMessageAsync(msg.info.helpMessage1,null);
                 event.getAuthor().getPrivateChannel().sendMessageAsync(msg.info.helpMessage2,null);
@@ -67,7 +79,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
             }
             else{
 
-                event.getChannel().sendMessageAsync(msg.general.UsageReminder(event.getAuthor().getUsername()),null);    
+                event.getChannel().sendMessageAsync(msg.general.UsageReminder(event.getAuthor().getUsername()),null);
                 event.getAuthor().getPrivateChannel().sendMessageAsync("how can I help you?",null);
             }
         }
@@ -76,7 +88,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
             purgeLists(event.getJDA());
             event.getChannel().sendMessageAsync(msg.info.ListHuntersInQueueGreeting(leaderList.size(), mercList.size()),null);
         }
-        
+
         else if(message.toLowerCase().equals("/neko myhunt")){
             Leader user=null;
             for(Leader u :leaderList){
@@ -84,17 +96,17 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                     user=u;
                 }
             }
-                    
+
             if(user==null){
                 event.getChannel().sendMessageAsync(msg.error.NotListedAsLeader(),null);
                 return;
             }
-                    
+
             event.getChannel().sendMessageAsync(msg.info.GetRoomInfo(token, user),null);
-                    
+
             return;
         }
-        
+
         else if(message.toLowerCase().startsWith("/neko lookup ")){
             String name = message.substring(13);
             List<User> users = findUsers(name, event.getJDA().getGuildById("120889695658967041"));
@@ -103,10 +115,10 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                 return;
             }
             try{
-            Profile found = Profiles.getInstance().getProfile(users.get(0).getId());
-            if(event.getJDA().getUserById(found.GetUserID())==null){
-                event.getChannel().sendMessageAsync(msg.error.UserLeftServer(),null);
-            }
+                Profile found = Profiles.getInstance().getProfile(users.get(0).getId());
+                if(event.getJDA().getUserById(found.GetUserID())==null){
+                    event.getChannel().sendMessageAsync(msg.error.UserLeftServer(),null);
+                }
                 if (users.size()==1){
                     event.getChannel().sendMessageAsync(msg.info.GetProfileInfo(event.getJDA().getUserById(found.GetUserID()).getUsername(), found),null);
                     return;
@@ -120,12 +132,12 @@ MessageHandler msg = MessageHandler.GetInstance() ;
             event.getChannel().sendMessageAsync(msg.error.MultipleUsersFound(users.size()),null);
             return;
         }
-                
+
         //let /neko anything bring a help menu up in that chat
         else if (message.toLowerCase().startsWith("/neko") || message.toLowerCase().startsWith("%neko")){
             Profile profile = Profiles.getInstance().getProfile(event.getAuthor().getId());
             if (profile==null){
-            event.getChannel().sendMessageAsync(msg.general.UsageReminder(event.getAuthorName()),null);
+                event.getChannel().sendMessageAsync(msg.general.UsageReminder(event.getAuthorName()),null);
             }else{
                 event.getChannel().sendMessageAsync("Nya **__"+event.getAuthorName()+"__**!\n Nice to see you again!", null);
                 event.getAuthor().getPrivateChannel().sendMessageAsync("how can I help you?",null);
@@ -141,170 +153,168 @@ MessageHandler msg = MessageHandler.GetInstance() ;
         if(event.getAuthor().isBot()){
             return;
         }
-        Profile p=Profiles.getInstance().getProfile(event.getAuthor().getId());
+        Profile p=Profiles.getInstance().getProfile(JDAHelper.GetAuthorID(event));
         if (p==null){
-                //make profile
-                Profiles.getInstance().set(new String[] {event.getAuthor().getId(),"","","1"});
-                
-                //event.getChannel().sendMessageAsync("Nya **__"+event.getAuthorName()+"__**! check your meowssages to fill your guild card info to start having a Nekool time.", null);
-                event.getAuthor().getPrivateChannel().sendMessageAsync(msg.info.helpMessage1,null);
-                event.getAuthor().getPrivateChannel().sendMessageAsync(msg.info.helpMessage2,null);
-                return;
+            //make profile
+            Profiles.getInstance().set(new String[] {JDAHelper.GetAuthorID(event),"","","1"});
+
+            //event.getChannel().sendMessageAsync("Nya **__"+event.getAuthorName()+"__**! check your meowssages to fill your guild card info to start having a Nekool time.", null);
+            JDAHelper.SendDM(event, msg.info.helpMessage1);
+            JDAHelper.SendDM(event, msg.info.helpMessage2);
+            return;
         }
-        
-        String message = event.getMessage().getRawContent();
+
+        String message = JDAHelper.GetMessageRaw(event);
         if (message.equalsIgnoreCase("help")){
-            event.getChannel().sendMessageAsync(msg.info.helpMessage1, null);
-            event.getChannel().sendMessageAsync(msg.info.helpMessage2, null);
+            JDAHelper.Respond(event, msg.info.helpMessage1);
+            JDAHelper.Respond(event, msg.info.helpMessage2);
         }
-        
+
         else if(message.toLowerCase().startsWith("lookup ")){
             String name = message.substring(7);
-            List<User> users = findUsers(name, event.getJDA().getGuildById("120889695658967041"));
+            List<User> users = findUsers(name, JDAHelper.GetMHGH(event));
             if (users.isEmpty()){
-                event.getChannel().sendMessageAsync(msg.error.NameNotFound(),null);
+                JDAHelper.Respond(event, msg.error.NameNotFound());
                 return;
             }
             try{
-            Profile found = Profiles.getInstance().getProfile(users.get(0).getId());
-            if(event.getJDA().getUserById(found.GetUserID())==null){
-                event.getChannel().sendMessageAsync(msg.error.UserLeftServer(),null);
-            }
-            
+                Profile found = Profiles.getInstance().getProfile(users.get(0).getId());
+                if(event.getJDA().getUserById(found.GetUserID())==null){
+                    JDAHelper.Respond(event, msg.error.UserLeftServer());
+                }
+
                 if (users.size()==1){
-                    event.getChannel().sendMessageAsync(msg.info.GetProfileInfo(event.getJDA().getUserById(found.GetUserID()).getUsername(), found),null);
+                    JDAHelper.Respond(event, msg.info.GetProfileInfo(JDAHelper.GetUsername(event, found.GetUserID()), found));
                     return;
                 }
-                
+
             } catch(Exception e){
                 //event.getChannel().sendMessageAsync("hunter may have corrupted data, please let @pikk know so he may try to fix his dumb error",null);
                 System.out.println("error with: " +users.get(0).getId());
                 //System.out.println(event.getJDA().getUserById(Profiles.getInstance().getProfile(users.get(0).getId()).UserID).getUsername());
             }
-            event.getChannel().sendMessageAsync(msg.error.MultipleUsersFound(users.size()),null);
+            JDAHelper.Respond(event, msg.error.MultipleUsersFound(users.size()));
             return;
-            
+
         }
-        
+
         else if(message.toLowerCase().startsWith("add ")){
             //add a thing
             for(String str : Weapons){
                 if (message.toLowerCase().endsWith(str.toLowerCase())){
                     p.addWeapon(str);
                     Profiles.getInstance().setProfile(p);
-                    event.getChannel().sendMessageAsync(msg.success.WeaponAdded(str),null);
+                    JDAHelper.Respond(event, msg.success.WeaponAdded(str));
                     return;
                 }
             }
-            
+
             for(String str : Roles){
                 if (message.toLowerCase().endsWith(str.toLowerCase())){
                     p.addRole(str);
                     Profiles.getInstance().setProfile(p);
-                    event.getChannel().sendMessageAsync(msg.success.RoleAdded(str),null);
+                    JDAHelper.Respond(event, msg.success.RoleAdded(str));
                     return;
                 }
             }
-            
-            event.getChannel().sendMessageAsync(msg.error.InvalidRoleOrWeapon(),null);
-            
+            JDAHelper.Respond(event, msg.error.InvalidRoleOrWeapon());
+
         }
-        
+
         else if(message.toLowerCase().startsWith("remove ")){
             //remove a thing
             for(String str : p.GetWeaponList()){
                 if (message.toLowerCase().endsWith(str.toLowerCase())){
                     p.removeWeapon(str);
                     Profiles.getInstance().setProfile(p);
-                    event.getChannel().sendMessageAsync(msg.success.WeaponRemoved(str),null);
+                    JDAHelper.Respond(event, msg.success.WeaponRemoved(str));
                     return;
                 }
             }
-            
+
             for(String str : p.GetRoleList()){
                 if (message.toLowerCase().endsWith(str.toLowerCase())){
                     p.removeRole(str);
                     Profiles.getInstance().setProfile(p);
-                    event.getChannel().sendMessageAsync(msg.success.RoleRemoved(str),null);
+                    JDAHelper.Respond(event, msg.success.RoleRemoved(str));
                     return;
                 }
             }
-            
-            event.getChannel().sendMessageAsync("I could meownt find that role or weapon of yours. do you want to see \"myRoles\" or \"myWeapons\"?",null);
-            
+            JDAHelper.Respond(event, msg.error.RoleOrWeaponNotFound());
         }
-        
+
         else if(message.equalsIgnoreCase("roles")){
             //list roles
-            event.getChannel().sendMessageAsync(msg.info.RecognizedRoles(Roles),null);
+            JDAHelper.Respond(event, msg.info.RecognizedRoles(Roles));
         }
-        
+
         else if(message.equalsIgnoreCase("myRoles")){
             //list users roles
-            event.getChannel().sendMessageAsync(msg.info.UserRoles(p),null);
+            JDAHelper.Respond(event, msg.info.UserRoles(p));
         }
-        
+
         else if(message.equalsIgnoreCase("myWeapons")){
             //list weapons
-            event.getChannel().sendMessageAsync(msg.info.UserWeapons(p),null);
+            JDAHelper.Respond(event,msg.info.UserWeapons(p));
         }
-        
+
         else if(message.equalsIgnoreCase("weapons")){
-            event.getChannel().sendMessageAsync(msg.info.RecognizedWeapons(Weapons),null);
+            JDAHelper.Respond(event, msg.info.RecognizedWeapons(Weapons));
         }
-        
+
         else if(message.equalsIgnoreCase("myRank")){
             //display users rank
-            event.getChannel().sendMessageAsync(msg.info.UserRank(p),null);
+            JDAHelper.Respond(event, msg.info.UserRank(p));
         }
-        
+
         else if(message.equalsIgnoreCase("rankUp")){
             if (p.GetHunterRank().GetRank()==999){
-                event.getChannel().sendMessageAsync(msg.response.WiseCat(),null);
+                JDAHelper.Respond(event, msg.response.WiseCat());
                 return;
             }
             p.GetHunterRank().RankUp();
-            event.getChannel().sendMessageAsync(msg.success.HunterRankUp(p),null);
+            JDAHelper.Respond(event, msg.success.HunterRankUp(p));
             Profiles.getInstance().setProfile(p);
+
             //send message to spectra for rank up
-            event.getJDA().getUserById("135251434445733888").getPrivateChannel().sendMessageAsync(event.getAuthor().getId()+":"+Integer.toString(p.GetHunterRank().GetRank()),null);
+            SpectraHelper.RankUpdateEvent(event, p);
             //add one to rank
-            
+
         }
-        
+
         else if(message.toLowerCase().startsWith("changerank ")){
             //changes rank to X
             String newInt=message.substring(11);
             try {
                 int newRank=Integer.parseInt(newInt);
                 if (newRank<0 || newRank>999){
-                    event.getChannel().sendMessageAsync(msg.response.WiseCat(),null);
+                    JDAHelper.Respond(event, msg.response.WiseCat());
                     return;
                 }
                 p.GetHunterRank().SetRank(newRank);
-                event.getChannel().sendMessageAsync(msg.success.HunterRankChanged(p),null);
+                JDAHelper.Respond(event, msg.success.HunterRankChanged(p));
                 Profiles.getInstance().setProfile(p);
                 //send message to spectra for rank up
-                event.getJDA().getUserById("135251434445733888").getPrivateChannel().sendMessageAsync(event.getAuthor().getId()+":"+Integer.toString(p.GetHunterRank().GetRank()),null);
+                SpectraHelper.RankUpdateEvent(event, p);
             } catch (Exception e){
-                event.getChannel().sendMessageAsync(msg.error.NotANumber(),null);
+                JDAHelper.Respond(event, msg.error.NotANumber());
             }
         }
-        
-        else if(message.equalsIgnoreCase("/shutdown")&&modIDs.contains(event.getAuthor().getId())){
-            event.getChannel().sendMessage("Aye Sir!");
-            event.getJDA().shutdown();
+
+        else if(message.equalsIgnoreCase("/shutdown")&&modIDs.contains(JDAHelper.GetAuthorID(event))){
+            JDAHelper.Message(event, "Aye Sir!");
+            JDAHelper.Shutdown(event);
             Profiles.getInstance().shutdown();
-            
+
         }
-        
+
         else if(message.toLowerCase().startsWith("enlist leader ")){
-            if(getLeaderObj(event.getAuthor().getId())!=null){
-                event.getChannel().sendMessageAsync(msg.error.AlreadyEnlisted(true),null);
+            if(getLeaderObj(JDAHelper.GetAuthorID(event))!=null){
+                JDAHelper.Respond(event,msg.error.AlreadyEnlisted(true));
                 return;
             }
             if(getMercObj(event.getAuthor().getId())!=null){
-                event.getChannel().sendMessageAsync(msg.error.AlreadyEnlisted(true),null);
+                JDAHelper.Respond(event, msg.error.AlreadyEnlisted(true));
                 return;
             }
             String[] strings = message.split(" ");
@@ -316,7 +326,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
             try{
                 thisHuntRank=Integer.parseInt(strings[4]);
                 if (thisHuntRank<1 || thisHuntRank>p.GetHunterRank().GetRank()){
-                    event.getChannel().sendMessageAsync(msg.error.InvalidHuntRank(p, false),null);
+                    JDAHelper.Respond(event, msg.error.InvalidHuntRank(p, false));
                     return;
                 }
             }catch(Exception e){
@@ -341,9 +351,9 @@ MessageHandler msg = MessageHandler.GetInstance() ;
             Leader you = new Leader(p, thisHuntRank, s, strings[2], strings[3], false);
             leaderList.add(you);
             event.getChannel().sendMessageAsync("I have listed you as a leader! search for hunters!",null);
-            
+
         }
-        
+
         else if(message.toLowerCase().startsWith("enlist merc ")){
             if(getLeaderObj(event.getAuthor().getId())!=null){
                 event.getChannel().sendMessageAsync(msg.error.AlreadyEnlisted(true),null);
@@ -354,7 +364,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                 return;
             }
             String[] strings = message.split(" ");
-            
+
             String s="";
             for(int i=3; i<strings.length; i++){
                 s+=strings[i]+" ";
@@ -388,18 +398,18 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                     return;
                 }
             }
-            
+
         }
-        
+
         else if(message.equalsIgnoreCase("delist")){
-            
+
             Leader lead = getLeaderObj(event.getAuthor().getId());
             if (lead != null){
                 leaderList.remove(lead);
                 event.getChannel().sendMessageAsync(msg.success.Delisted(true),null);
                 return;
             }
-            
+
             Merc merc = getMercObj(event.getAuthor().getId());
             if (merc != null){
                 mercList.remove(merc);
@@ -408,14 +418,14 @@ MessageHandler msg = MessageHandler.GetInstance() ;
             }
             event.getChannel().sendMessageAsync(msg.error.AlreadyDelisted(),null);
         }
-        
+
         else if(message.equalsIgnoreCase("hunters")){
             purgeLists(event.getJDA());
             event.getChannel().sendMessageAsync(msg.info.ListHuntersInQueue(leaderList.size(), mercList.size()),null);
         }
-        
+
         else{//need to be a leader or mercenary to get this far, or its an error which is handled at the end
-            
+
             boolean isLeader=false;
             Leader leader=null;
             Merc merc=null;
@@ -432,9 +442,9 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                     break;
                 }
             }
-            
+
             //
-            
+
             if(!isLeader){
                 for(Merc mercen : mercList){
                     if(p.GetUserID().equals(mercen.GetProfile().GetUserID())){
@@ -442,8 +452,8 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         merc=mercen;
                         merc.now=OffsetDateTime.now();
                         if(message.equalsIgnoreCase("filters")){
-                        event.getChannel().sendMessageAsync(msg.info.FiltersAvailable(mercFilters, isLeader),null);
-                        return;
+                            event.getChannel().sendMessageAsync(msg.info.FiltersAvailable(mercFilters, isLeader),null);
+                            return;
                         }
                         break;
                     }
@@ -459,17 +469,17 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                     int number = 1;
                     for(Merc mercen: mercList){
                         if (((mercen.GetProfile().GetHunterRank().GetRank()<=leader.rankH
-                                    && mercen.GetProfile().GetHunterRank().GetRank()>=leader.rankL)
+                                && mercen.GetProfile().GetHunterRank().GetRank()>=leader.rankL)
                                 ||(mercen.GetHuntRank()<=leader.rankH && mercen.GetHuntRank()>=leader.rankL))
-                                    && (mercen.hunting.toLowerCase().replaceAll("\\s+","").contains(leader.lookingToHunt.toLowerCase().replaceAll("\\s+",""))
+                                && (mercen.hunting.toLowerCase().replaceAll("\\s+","").contains(leader.lookingToHunt.toLowerCase().replaceAll("\\s+",""))
                                 || leader.lookingToHunt.toLowerCase().replaceAll("\\s+","").contains(mercen.hunting.toLowerCase().replaceAll("\\s+","")))
-                                    && (mercen.hasRole(leader.role)
+                                && (mercen.hasRole(leader.role)
                                 || leader.role.equals(""))
-                                    && (mercen.hasWeapon(leader.weapon)
+                                && (mercen.hasWeapon(leader.weapon)
                                 || leader.weapon.equals(""))
-                                    && (leader.huntTypeSearch.equals("")
+                                && (leader.huntTypeSearch.equals("")
                                 || leader.huntTypeSearch.equals(mercen.huntType))
-                                    && mercen.requestFrom==null){
+                                && mercen.requestFrom==null){
                             //check to make sure it isnt over 12 hours old first!
                             if(OffsetDateTime.now().isAfter(mercen.now.plusHours(4))){
                                 deleteList.add(mercen);
@@ -492,21 +502,21 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                     }
                     String sendme = mercs + msg.response.RoomListAppendix();
                     ArrayList<String> messages = splitMessage(sendme);
-                    
+
                     for(String s:messages){
                         event.getChannel().sendMessageAsync(s,null);
                     }
-                    
+
                     return;
                 }
-                
+
                 else if(message.toLowerCase().startsWith("ask ")){
                     String[] parsedm = message.split(" ");
                     if (parsedm.length!= 2){
                         event.getChannel().sendMessageAsync("`ask #` will ask that person on the list to join",null);
                         return;
                     }
-                    
+
                     try{
                         int listIndex = Integer.parseInt(parsedm[1]);
                         if (listIndex>leader.mercList.size() || listIndex<=0){//not a viable index
@@ -526,24 +536,24 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number next time.",null);
                     }
                     return;
-                    
+
                 }
-                
+
                 else if(message.toLowerCase().startsWith("slots ")){
-                   try{
-                       int s = Integer.parseInt(message.split(" ")[1]);
-                       if (s<0||s>3){
-                           event.getChannel().sendMessageAsync("you can only have 0-3 slots for hunters not including yourself **__"+event.getJDA().getUserById(p.GetUserID()).getUsername()+"__**",null);
-                           return;
-                       }
-                       leader.slots=s;
-                       event.getChannel().sendMessageAsync("Slots in group changed to `"+leader.slots+"`",null);
-                   }catch(Exception e){
-                       event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number next time.",null);
-                   }
-                   return;
+                    try{
+                        int s = Integer.parseInt(message.split(" ")[1]);
+                        if (s<0||s>3){
+                            event.getChannel().sendMessageAsync("you can only have 0-3 slots for hunters not including yourself **__"+event.getJDA().getUserById(p.GetUserID()).getUsername()+"__**",null);
+                            return;
+                        }
+                        leader.slots=s;
+                        event.getChannel().sendMessageAsync("Slots in group changed to `"+leader.slots+"`",null);
+                    }catch(Exception e){
+                        event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number next time.",null);
+                    }
+                    return;
                 }
-                
+
                 else if(message.equalsIgnoreCase("y")){
                     if (leader.requestFrom == null){
                         event.getChannel().sendMessageAsync("you have no requests waiting.",null);
@@ -557,11 +567,11 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                             + "Passcode: "+leader.GetRoom().GetPasscode(),null);
                     event.getJDA().getUserById(leader.requestFrom.GetProfile().GetUserID()).getPrivateChannel().sendMessageAsync("I have delisted you, happy hunting!",null);
                     mercList.remove(leader.requestFrom);
-                    
+
                     leader.requestFrom=null;
                     return;
                 }
-                
+
                 else if(message.equalsIgnoreCase("n")){
                     if (leader.requestFrom == null){
                         event.getChannel().sendMessageAsync("you have no requests waiting.",null);
@@ -572,14 +582,14 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                     leader.requestFrom=null;
                     return;
                 }
-                
+
                 else if(message.toLowerCase().startsWith("addfilter ")){
                     String[] parsedm = message.split(" ");
                     if (parsedm.length<3){
                         event.getChannel().sendMessageAsync("not enough informeowshin!",null);
                         return;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("rank>")){
                         try {
                             int rank=Integer.parseInt(parsedm[2]);
@@ -594,7 +604,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         }
                         return;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("rank<")){
                         try {
                             int rank=Integer.parseInt(parsedm[2]);
@@ -609,7 +619,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         }
                         return;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("role")){
                         for(String str : Roles){
                             if(parsedm[2].equalsIgnoreCase(str)){
@@ -621,7 +631,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         event.getChannel().sendMessageAsync("I could not find that role.",null);
                         return;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("weapon")){
                         for(String str : Weapons){
                             if(parsedm[2].equalsIgnoreCase(str)){
@@ -633,7 +643,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         event.getChannel().sendMessageAsync("I could not find that weapon.",null);
                         return;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("lookingtohunt")){
                         String s="";
                         for(int i=2; i<parsedm.length; i++){
@@ -643,36 +653,36 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         event.getChannel().sendMessageAsync("search will now try to find hunters with that interest.",null);
                         return;
                     }
-                    
+
                 }
-                
+
                 else if(message.toLowerCase().startsWith("removefilter ")){
                     String[] parsedm = message.split(" ");
                     if (parsedm.length!=2){
                         event.getChannel().sendMessageAsync("to use this catmand, type `removefilter <filtername>`.",null);
                         return;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("rank>")){
                         leader.rankL = leader.GetRoom().GetHunt().GetHuntRank();
                         return;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("rank<")){
                         leader.rankH = 999;
                         return;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("role")){
                         leader.role="";
                         return;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("weapon")){
                         leader.weapon="";
                         return;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("lookingtohunt")){
                         leader.lookingToHunt="";
                         return;
@@ -680,7 +690,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                     event.getChannel().sendMessageAsync("filter "+parsedm[1]+" removed.",null);
                 }
             }
-            
+
             if(isMerc){
                 if(message.equalsIgnoreCase("search")){
                     //search for leaders
@@ -690,9 +700,9 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                     List<Leader> deleteList = new ArrayList<>();
                     for(Leader lead: leaderList){
                         if (lead.slots>0 &&(merc.huntTypeSearch.equals("")
-                         || merc.huntTypeSearch.equals(lead.GetRoom().GetHunt().GetHuntType())) && ((lead.GetProfile().GetHunterRank().GetRank()<=merc.rankH && lead.GetProfile().GetHunterRank().GetRank()>=merc.rankL)
-                         || (lead.GetRoom().GetHunt().GetHuntRank()<=merc.rankH && lead.GetRoom().GetHunt().GetHuntRank()>=merc.rankL)) && (lead.GetRoom().GetHunt().GetMonster().toLowerCase().replaceAll("\\s+","").contains(merc.lookingToHunt.toLowerCase().replaceAll("\\s+",""))
-                         || (merc.lookingToHunt.toLowerCase().replaceAll("\\s+","").contains(lead.GetRoom().GetHunt().GetMonster().toLowerCase().replaceAll("\\s+","")))) && (lead.requestFrom==null)){
+                                || merc.huntTypeSearch.equals(lead.GetRoom().GetHunt().GetHuntType())) && ((lead.GetProfile().GetHunterRank().GetRank()<=merc.rankH && lead.GetProfile().GetHunterRank().GetRank()>=merc.rankL)
+                                || (lead.GetRoom().GetHunt().GetHuntRank()<=merc.rankH && lead.GetRoom().GetHunt().GetHuntRank()>=merc.rankL)) && (lead.GetRoom().GetHunt().GetMonster().toLowerCase().replaceAll("\\s+","").contains(merc.lookingToHunt.toLowerCase().replaceAll("\\s+",""))
+                                || (merc.lookingToHunt.toLowerCase().replaceAll("\\s+","").contains(lead.GetRoom().GetHunt().GetMonster().toLowerCase().replaceAll("\\s+","")))) && (lead.requestFrom==null)){
                             //check to make sure it isnt over 4 hours old first!
                             if(OffsetDateTime.now().isAfter(lead.now.plusHours(4))){
                                 deleteList.add(lead);
@@ -712,32 +722,32 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         Leader lead = it.next();
                         leaderList.remove(lead);
                     }
-                    
-                    
+
+
                     if(leaders.equals("")){
                         event.getChannel().sendMessageAsync("I could Meownt find any groups like that",null);
                         return;
                     }
                     String sendme = leaders
-                        + "`ask <X>` - asks a IHunter by number on your most recent search to join your room, or invite you to their room\n"
-                        + "\ndid you find what you were looking for? here are some catmand remeownders\n"
-                        + "`filters` - lists all filters that you can currently use to find Hunters.\n"
-                        + "`addFilter <filter> <X>` - filters hunters with X\n"
-                        + "`removeFilter <filter>` - clears that filter field\n";
+                            + "`ask <X>` - asks a IHunter by number on your most recent search to join your room, or invite you to their room\n"
+                            + "\ndid you find what you were looking for? here are some catmand remeownders\n"
+                            + "`filters` - lists all filters that you can currently use to find Hunters.\n"
+                            + "`addFilter <filter> <X>` - filters hunters with X\n"
+                            + "`removeFilter <filter>` - clears that filter field\n";
                     ArrayList<String> messageTwo = splitMessage(sendme);
                     for(String s:messageTwo){
                         event.getChannel().sendMessageAsync(s,null);
                     }
                     return;
                 }
-                
+
                 else if(message.toLowerCase().startsWith("ask ")){
                     String[] parsedm = message.split(" ");
                     if (parsedm.length!= 2){
                         event.getChannel().sendMessageAsync("`ask #` will ask that person on the list to join",null);
                         return;
                     }
-                    
+
                     try{
                         int listIndex = Integer.parseInt(parsedm[1]);
                         if (listIndex>merc.leaderList.size() || listIndex<=0){//not a viable index
@@ -757,9 +767,9 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number next time.",null);
                     }
                     return;
-                    
+
                 }
-                
+
                 else if(message.equalsIgnoreCase("y")){
                     if (merc.requestFrom == null){
                         event.getChannel().sendMessageAsync("you have no requests waiting.",null);
@@ -775,7 +785,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                     event.getChannel().sendMessageAsync("I have delisted you, happy hunting!",null);
                     return;
                 }
-                
+
                 else if(message.equalsIgnoreCase("n")){
                     if (merc.requestFrom == null){
                         event.getChannel().sendMessageAsync("you have no requests waiting.",null);
@@ -786,14 +796,14 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                     merc.requestFrom=null;
                     return;
                 }
-                
+
                 else if (message.toLowerCase().startsWith("addfilter ")){
                     String[] parsedm = message.split(" ");
                     if (parsedm.length<3){
                         event.getChannel().sendMessageAsync("not enough informeowshin!",null);
                         return;
                     }
-                    
+
                     else if(parsedm[1].equalsIgnoreCase("rank>")){
                         try {
                             int rank=Integer.parseInt(parsedm[2]);
@@ -808,7 +818,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         }
                         return;
                     }
-                    
+
                     else if(parsedm[1].equalsIgnoreCase("rank<")){
                         try {
                             int rank=Integer.parseInt(parsedm[2]);
@@ -823,7 +833,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         }
                         return;
                     }
-                    
+
                     else if(parsedm[1].equalsIgnoreCase("HuntRank")){
                         try {
                             int rank=Integer.parseInt(parsedm[2]);
@@ -838,7 +848,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         }
                         return;
                     }
-                    
+
                     else if(parsedm[1].equalsIgnoreCase("HuntType")){
                         for(String type: huntTypes){
                             if(type.equalsIgnoreCase(parsedm[2])){
@@ -850,7 +860,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         }
                         return;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("hunting")){
                         String s="";
                         for(int i=2; i<parsedm.length; i++){
@@ -861,47 +871,47 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         return;
                     }
                 }
-                
+
                 else if(message.toLowerCase().startsWith("removefilter ")){
                     String[] parsedm = message.split(" ");
                     if (parsedm.length!=2){
                         event.getChannel().sendMessageAsync("to use this catmand, type `removefilter <filtername>`.",null);
                         return;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("rank>")){
                         merc.rankL = 1;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("rank<")){
                         merc.rankH = 999;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("huntrank")){
                         merc.huntRankSearch=0;
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("hunttype")){
                         merc.huntTypeSearch="";
                     }
-                    
+
                     else if(parsedm[1].toLowerCase().equals("hunting")){
                         merc.lookingToHunt="";
                     }
-                    
+
                     event.getChannel().sendMessageAsync("filter "+parsedm[1]+" removed.",null);
                     return;
                 }
             }
-            
-            
+
+
             event.getChannel().sendMessageAsync("\uD83D\uDE40 I cant handle that right meow! \uD83D\uDE40\n"
                     + "if you need help, just type help.",null);
-            
+
         }
     }
-    
-    
+
+
     Leader getLeaderObj(String userID){
         for(Leader lead: leaderList){
             if(lead.GetProfile().GetUserID().equals(userID)){
@@ -910,7 +920,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
         }
         return null;
     }
-    
+
     Merc getMercObj(String userID){
         for(Merc merc: mercList){
             if(merc.GetProfile().GetUserID().equals(userID)){
@@ -962,7 +972,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
             return startswith;
         return contains;
     }
-    
+
     private static ArrayList<String> splitMessage(String stringtoSend)
     {
         ArrayList<String> msgs =  new ArrayList<>();
@@ -992,14 +1002,14 @@ MessageHandler msg = MessageHandler.GetInstance() ;
     public void purgeLists(JDA myJDA){
         List<Leader> deleteList1 = new ArrayList<>();
         List<Merc> deleteList2 = new ArrayList<>();
-        
+
         for(Leader lead: leaderList){
             if(OffsetDateTime.now().isAfter(lead.now.plusHours(4)) || (myJDA.getUserById(lead.GetProfile().GetUserID()).getOnlineStatus() == OnlineStatus.OFFLINE) ){
                 deleteList1.add(lead);
             }
         }
         leaderList.removeAll(deleteList1);
-        
+
         for(Merc mercen: mercList){
             if(OffsetDateTime.now().isAfter(mercen.now.plusHours(4)) || (myJDA.getUserById(mercen.GetProfile().GetUserID()).getOnlineStatus() == OnlineStatus.OFFLINE)){
                 deleteList2.add(mercen);
@@ -1015,8 +1025,10 @@ MessageHandler msg = MessageHandler.GetInstance() ;
         new Neko().init();
         // TODO code application logic here
     }
-    
+
     public void init() {
+        SetToken();
+        SetModIDs();
         Profiles.getInstance().read();
         try {
             new JDABuilder().addListener(this).setBotToken(token).setAudioEnabled(false).buildAsync();
@@ -1025,5 +1037,5 @@ MessageHandler msg = MessageHandler.GetInstance() ;
             System.exit(1);
         }
     }
-    
+
 }
