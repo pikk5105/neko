@@ -80,7 +80,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
         else if(message.toLowerCase().equals("/neko myhunt")){
             Leader user=null;
             for(Leader u :leaderList){
-                if (u.profile.GetUserID().equals(event.getAuthor().getId())){
+                if (u.GetProfile().GetUserID().equals(event.getAuthor().getId())){
                     user=u;
                 }
             }
@@ -458,13 +458,18 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                     List<Merc> deleteList = new ArrayList<>();
                     int number = 1;
                     for(Merc mercen: mercList){
-                        if (((mercen.profile.rank<=leader.rankH && mercen.profile.rank>=leader.rankL) ||(mercen.huntRank<=leader.rankH && mercen.huntRank>=leader.rankL)) &&
-                                (mercen.hunting.toLowerCase().replaceAll("\\s+","").contains(leader.lookingToHunt.toLowerCase().replaceAll("\\s+","")) ||
-                                leader.lookingToHunt.toLowerCase().replaceAll("\\s+","").contains(mercen.hunting.toLowerCase().replaceAll("\\s+",""))) &&
-                                (mercen.hasRole(leader.role) || leader.role.equals("")) &&
-                                (mercen.hasWeapon(leader.weapon) || leader.weapon.equals("")) &&
-                                (leader.huntTypeSearch.equals("") || leader.huntTypeSearch.equals(mercen.huntType))&&
-                                mercen.requestFrom==null){
+                        if (((mercen.GetProfile().GetHunterRank().GetRank()<=leader.rankH
+                                    && mercen.GetProfile().GetHunterRank().GetRank()>=leader.rankL)
+                                ||(mercen.GetHuntRank()<=leader.rankH && mercen.GetHuntRank()>=leader.rankL))
+                                    && (mercen.hunting.toLowerCase().replaceAll("\\s+","").contains(leader.lookingToHunt.toLowerCase().replaceAll("\\s+",""))
+                                || leader.lookingToHunt.toLowerCase().replaceAll("\\s+","").contains(mercen.hunting.toLowerCase().replaceAll("\\s+","")))
+                                    && (mercen.hasRole(leader.role)
+                                || leader.role.equals(""))
+                                    && (mercen.hasWeapon(leader.weapon)
+                                || leader.weapon.equals(""))
+                                    && (leader.huntTypeSearch.equals("")
+                                || leader.huntTypeSearch.equals(mercen.huntType))
+                                    && mercen.requestFrom==null){
                             //check to make sure it isnt over 12 hours old first!
                             if(OffsetDateTime.now().isAfter(mercen.now.plusHours(4))){
                                 deleteList.add(mercen);
@@ -515,8 +520,8 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                             return;
                         }
                         m.requestFrom=leader;
-                        event.getJDA().getUserById(m.profile.UserID).getPrivateChannel().sendMessageAsync("**__"+event.getJDA().getUserById(leader.profile.UserID).getUsername()+"__** would like you to hunt\n\""+leader.hunting+"\"\nwould you like to accept? (Y/N)",null);
-                        event.getChannel().sendMessageAsync("Invitation has been sent to "+event.getJDA().getUserById(m.profile.UserID).getUsername(), null);
+                        event.getJDA().getUserById(m.GetProfile().GetUserID()).getPrivateChannel().sendMessageAsync("**__"+event.getJDA().getUserById(leader.GetProfile().GetUserID()).getUsername()+"__** would like you to hunt\n\""+leader.GetRoom().GetHunt().GetMonster()+"\"\nwould you like to accept? (Y/N)",null);
+                        event.getChannel().sendMessageAsync("Invitation has been sent to "+event.getJDA().getUserById(m.GetProfile().GetUserID()).getUsername(), null);
                     }catch(Exception e){
                         event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number next time.",null);
                     }
@@ -528,7 +533,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                    try{
                        int s = Integer.parseInt(message.split(" ")[1]);
                        if (s<0||s>3){
-                           event.getChannel().sendMessageAsync("you can only have 0-3 slots for hunters not including yourself **__"+event.getJDA().getUserById(p.UserID).getUsername()+"__**",null);
+                           event.getChannel().sendMessageAsync("you can only have 0-3 slots for hunters not including yourself **__"+event.getJDA().getUserById(p.GetUserID()).getUsername()+"__**",null);
                            return;
                        }
                        leader.slots=s;
@@ -545,12 +550,12 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         return;
                     }
                     leader.slots--;
-                    event.getChannel().sendMessageAsync("I sent **__"+event.getJDA().getUserById(leader.requestFrom.profile.UserID).getUsername()+"__** the hall info\n"
+                    event.getChannel().sendMessageAsync("I sent **__"+event.getJDA().getUserById(leader.requestFrom.GetProfile().GetUserID()).getUsername()+"__** the hall info\n"
                             + "you have "+leader.slots+" slots left.",null);
-                    event.getJDA().getUserById(leader.requestFrom.profile.UserID).getPrivateChannel().sendMessageAsync("Join **__"+event.getJDA().getUserById(leader.profile.UserID).getUsername()+"__**'s hunt!\n"
-                            + "HallID:   "+leader.hallID+"\n"
-                            + "Passcode: "+leader.passcode,null);
-                    event.getJDA().getUserById(leader.requestFrom.profile.UserID).getPrivateChannel().sendMessageAsync("I have delisted you, happy hunting!",null);
+                    event.getJDA().getUserById(leader.requestFrom.GetProfile().GetUserID()).getPrivateChannel().sendMessageAsync("Join **__"+event.getJDA().getUserById(leader.GetProfile().GetUserID()).getUsername()+"__**'s hunt!\n"
+                            + "HallID:   "+leader.GetRoom().GetRoomID()+"\n"
+                            + "Passcode: "+leader.GetRoom().GetPasscode(),null);
+                    event.getJDA().getUserById(leader.requestFrom.GetProfile().GetUserID()).getPrivateChannel().sendMessageAsync("I have delisted you, happy hunting!",null);
                     mercList.remove(leader.requestFrom);
                     
                     leader.requestFrom=null;
@@ -562,8 +567,8 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         event.getChannel().sendMessageAsync("you have no requests waiting.",null);
                         return;
                     }
-                    event.getChannel().sendMessageAsync("you declined **__"+event.getJDA().getUserById(leader.requestFrom.profile.UserID).getUsername()+"__**'s request",null);
-                    event.getJDA().getUserById(leader.requestFrom.profile.UserID).getPrivateChannel().sendMessageAsync("**__"+event.getJDA().getUserById(leader.profile.UserID).getUsername()+"__** declined your request",null);
+                    event.getChannel().sendMessageAsync("you declined **__"+event.getJDA().getUserById(leader.requestFrom.GetProfile().GetUserID()).getUsername()+"__**'s request",null);
+                    event.getJDA().getUserById(leader.requestFrom.GetProfile().GetUserID()).getPrivateChannel().sendMessageAsync("**__"+event.getJDA().getUserById(leader.GetProfile().GetUserID()).getUsername()+"__** declined your request",null);
                     leader.requestFrom=null;
                     return;
                 }
@@ -649,7 +654,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                     }
                     
                     else if(parsedm[1].toLowerCase().equals("rank>")){
-                        leader.rankL = leader.huntRank;
+                        leader.rankL = leader.GetRoom().GetHunt().GetHuntRank();
                         return;
                     }
                     
@@ -684,22 +689,20 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                     int number=1;
                     List<Leader> deleteList = new ArrayList<>();
                     for(Leader lead: leaderList){
-                        if (lead.slots>0 &&
-                                (merc.huntTypeSearch.equals("") || merc.huntTypeSearch.equals(lead.huntType)) &&
-                                ((lead.profile.rank<=merc.rankH && lead.profile.rank>=merc.rankL) || (lead.huntRank<=merc.rankH && lead.huntRank>=merc.rankL)) &&
-                                (lead.hunting.toLowerCase().replaceAll("\\s+","").contains(merc.lookingToHunt.toLowerCase().replaceAll("\\s+","")) ||
-                                (merc.lookingToHunt.toLowerCase().replaceAll("\\s+","").contains(lead.hunting.toLowerCase().replaceAll("\\s+","")))) &&
-                                (lead.requestFrom==null)){
+                        if (lead.slots>0 &&(merc.huntTypeSearch.equals("")
+                         || merc.huntTypeSearch.equals(lead.GetRoom().GetHunt().GetHuntType())) && ((lead.GetProfile().GetHunterRank().GetRank()<=merc.rankH && lead.GetProfile().GetHunterRank().GetRank()>=merc.rankL)
+                         || (lead.GetRoom().GetHunt().GetHuntRank()<=merc.rankH && lead.GetRoom().GetHunt().GetHuntRank()>=merc.rankL)) && (lead.GetRoom().GetHunt().GetMonster().toLowerCase().replaceAll("\\s+","").contains(merc.lookingToHunt.toLowerCase().replaceAll("\\s+",""))
+                         || (merc.lookingToHunt.toLowerCase().replaceAll("\\s+","").contains(lead.GetRoom().GetHunt().GetMonster().toLowerCase().replaceAll("\\s+","")))) && (lead.requestFrom==null)){
                             //check to make sure it isnt over 4 hours old first!
                             if(OffsetDateTime.now().isAfter(lead.now.plusHours(4))){
                                 deleteList.add(lead);
                             }else{
                                 //can be added(will use more search parameters later)
                                 merc.leaderList.add(lead);
-                                leaders+=Integer.toString(number)+".    **__"+event.getJDA().getUserById(lead.profile.UserID).getUsername()
-                                        +"__**  (Hunter rank:  `"+Integer.toString(lead.profile.rank)
-                                        +"`)\n      hunting rank: `"+Integer.toString(lead.huntRank)
-                                        +"`,  Description:  "+lead.hunting+"\n";
+                                leaders+=Integer.toString(number)+".    **__"+event.getJDA().getUserById(lead.GetProfile().GetUserID()).getUsername()
+                                        +"__**  (IHunter rank:  `"+Integer.toString(lead.GetProfile().GetHunterRank().GetRank())
+                                        +"`)\n      hunting rank: `"+Integer.toString(lead.GetRoom().GetHunt().GetHuntRank())
+                                        +"`,  Description:  "+lead.GetRoom().GetDescription()+"\n";
                                 number++;
                             }
                         }
@@ -716,7 +719,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         return;
                     }
                     String sendme = leaders
-                        + "`ask <X>` - asks a Hunter by number on your most recent search to join your room, or invite you to their room\n"
+                        + "`ask <X>` - asks a IHunter by number on your most recent search to join your room, or invite you to their room\n"
                         + "\ndid you find what you were looking for? here are some catmand remeownders\n"
                         + "`filters` - lists all filters that you can currently use to find Hunters.\n"
                         + "`addFilter <filter> <X>` - filters hunters with X\n"
@@ -748,8 +751,8 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                             return;
                         }
                         l.requestFrom=merc;
-                        event.getJDA().getUserById(l.profile.UserID).getPrivateChannel().sendMessageAsync("**__"+event.getJDA().getUserById(merc.profile.UserID).getUsername()+"__** would like to hunt with you, would you like to accept? (Y/N)",null);
-                        event.getChannel().sendMessageAsync("Invitation requested from "+event.getJDA().getUserById(l.profile.UserID).getUsername(),null);
+                        event.getJDA().getUserById(l.GetProfile().GetUserID()).getPrivateChannel().sendMessageAsync("**__"+event.getJDA().getUserById(merc.GetProfile().GetUserID()).getUsername()+"__** would like to hunt with you, would you like to accept? (Y/N)",null);
+                        event.getChannel().sendMessageAsync("Invitation requested from "+event.getJDA().getUserById(l.GetProfile().GetUserID()).getUsername(),null);
                     }catch(Exception e){
                         event.getChannel().sendMessageAsync("MEOWCH, You are bad at math! Try using a number next time.",null);
                     }
@@ -763,11 +766,11 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         return;
                     }
                     merc.requestFrom.slots--;
-                    event.getJDA().getUserById(merc.requestFrom.profile.UserID).getPrivateChannel().sendMessageAsync("I sent **__"+event.getJDA().getUserById(merc.profile.UserID).getUsername()+"__** the hall info\n"
+                    event.getJDA().getUserById(merc.requestFrom.GetProfile().GetUserID()).getPrivateChannel().sendMessageAsync("I sent **__"+event.getJDA().getUserById(merc.GetProfile().GetUserID()).getUsername()+"__** the hall info\n"
                             + "you have "+merc.requestFrom.slots+" slots left",null);
-                    event.getChannel().sendMessageAsync("Join **__"+event.getJDA().getUserById(merc.requestFrom.profile.UserID).getUsername()+"__**'s hunt!\n"
-                            + "HallID:   "+merc.requestFrom.hallID+"\n"
-                            + "Passcode: "+merc.requestFrom.passcode,null);
+                    event.getChannel().sendMessageAsync("Join **__"+event.getJDA().getUserById(merc.requestFrom.GetProfile().GetUserID()).getUsername()+"__**'s hunt!\n"
+                            + "HallID:   "+merc.requestFrom.GetRoom().GetRoomID()+"\n"
+                            + "Passcode: "+merc.requestFrom.GetRoom().GetPasscode(),null);
                     mercList.remove(merc);
                     event.getChannel().sendMessageAsync("I have delisted you, happy hunting!",null);
                     return;
@@ -778,8 +781,8 @@ MessageHandler msg = MessageHandler.GetInstance() ;
                         event.getChannel().sendMessageAsync("you have no requests waiting.",null);
                         return;
                     }
-                    event.getChannel().sendMessageAsync("you declined **__"+event.getJDA().getUserById(merc.requestFrom.profile.UserID).getUsername()+"__**'s request",null);
-                    event.getJDA().getUserById(merc.requestFrom.profile.UserID).getPrivateChannel().sendMessageAsync("**__"+event.getJDA().getUserById(merc.profile.UserID).getUsername()+"__**declined your request",null);
+                    event.getChannel().sendMessageAsync("you declined **__"+event.getJDA().getUserById(merc.requestFrom.GetProfile().GetUserID()).getUsername()+"__**'s request",null);
+                    event.getJDA().getUserById(merc.requestFrom.GetProfile().GetUserID()).getPrivateChannel().sendMessageAsync("**__"+event.getJDA().getUserById(merc.GetProfile().GetUserID()).getUsername()+"__**declined your request",null);
                     merc.requestFrom=null;
                     return;
                 }
@@ -901,7 +904,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
     
     Leader getLeaderObj(String userID){
         for(Leader lead: leaderList){
-            if(lead.profile.UserID.equals(userID)){
+            if(lead.GetProfile().GetUserID().equals(userID)){
                 return lead;
             }
         }
@@ -910,7 +913,7 @@ MessageHandler msg = MessageHandler.GetInstance() ;
     
     Merc getMercObj(String userID){
         for(Merc merc: mercList){
-            if(merc.profile.UserID.equals(userID)){
+            if(merc.GetProfile().GetUserID().equals(userID)){
                 return merc;
             }
         }
@@ -991,14 +994,14 @@ MessageHandler msg = MessageHandler.GetInstance() ;
         List<Merc> deleteList2 = new ArrayList<>();
         
         for(Leader lead: leaderList){
-            if(OffsetDateTime.now().isAfter(lead.now.plusHours(4)) || (myJDA.getUserById(lead.profile.UserID).getOnlineStatus() == OnlineStatus.OFFLINE) ){
+            if(OffsetDateTime.now().isAfter(lead.now.plusHours(4)) || (myJDA.getUserById(lead.GetProfile().GetUserID()).getOnlineStatus() == OnlineStatus.OFFLINE) ){
                 deleteList1.add(lead);
             }
         }
         leaderList.removeAll(deleteList1);
         
         for(Merc mercen: mercList){
-            if(OffsetDateTime.now().isAfter(mercen.now.plusHours(4)) || (myJDA.getUserById(mercen.profile.UserID).getOnlineStatus() == OnlineStatus.OFFLINE)){
+            if(OffsetDateTime.now().isAfter(mercen.now.plusHours(4)) || (myJDA.getUserById(mercen.GetProfile().GetUserID()).getOnlineStatus() == OnlineStatus.OFFLINE)){
                 deleteList2.add(mercen);
             }
         }
