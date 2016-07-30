@@ -67,7 +67,8 @@ public class Neko extends ListenerAdapter{
     //private profiles[] profilesList; not needed
     // msg      msg.errors.InvalidHunterRank()
     @Override
-    public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+    public void onGuildMessageReceived(GuildMessageReceivedEvent event)
+    {
         String message = event.getMessage().getRawContent();
 
         if (message.equalsIgnoreCase("/neko") || message.equalsIgnoreCase("%neko")){
@@ -88,12 +89,14 @@ public class Neko extends ListenerAdapter{
             }
         }
 
-        else if(message.equalsIgnoreCase("/neko hunters")){
+        else if(message.equalsIgnoreCase("/neko hunters"))
+        {
             purgeLists(event.getJDA());
             event.getChannel().sendMessageAsync(msg.info.ListHuntersInQueueGreeting(leaderList.size(), mercList.size()),null);
         }
 
-        else if(message.toLowerCase().equals("/neko myhunt")){
+        else if(message.toLowerCase().equals("/neko myhunt"))
+        {
             Leader user=null;
             for(Leader u :leaderList){
                 if (u.GetProfile().GetUserID().equals(event.getAuthor().getId())){
