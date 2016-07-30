@@ -15,6 +15,8 @@ import java.util.List;
  */
 public class Merc {
     private Profile profile;
+    private Room room;
+    private Filters filters;
     private int huntRank=0;
     String hunting="";
     String huntType="";

@@ -17,6 +17,7 @@ public class Leader
 {
     Profile profile     = null;
     private Room room   = null;
+    private Filters filters = null;
     OffsetDateTime now  = OffsetDateTime.now();
 
     //search filters
