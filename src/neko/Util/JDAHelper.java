@@ -1,6 +1,7 @@
 package neko.Util;
 
 import net.dv8tion.jda.entities.Guild;
+import net.dv8tion.jda.entities.User;
 import net.dv8tion.jda.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -81,6 +82,17 @@ public class JDAHelper
     public static String GetAuthorID(PrivateMessageReceivedEvent event)
     {
         return event.getAuthor().getId();
+    }
+
+    /**
+     * <b>Retrieves User object by UserID</b>
+     * @param event Required JDA PrivateMessageReceivedEvent.
+     * @param id Discord UserID to retrieve User from.
+     * @return Returns User object.
+     */
+    public static User GetUserByID(PrivateMessageReceivedEvent event, String id)
+    {
+        return event.getJDA().getUserById(id);
     }
 
     /**
