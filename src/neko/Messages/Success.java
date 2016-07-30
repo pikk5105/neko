@@ -60,4 +60,14 @@ public class Success
             return "I have removed you from active Mercenaries, I hope you had a meowvelous hunt.";
         }
     }
+
+    public String HunterAsked(String username)
+    {
+        return "Invitation has been sent to "+username;
+    }
+
+    public String SlotsChanged(int slots)
+    {
+        return "Slots in group changed to `"+slots+"`";
+    }
 }
