@@ -12,7 +12,6 @@ public class SpectraHelper
 
     /**
      * <b>Sends Direct Message to Spectra</b>
-     *
      * @param event Required JDA PrivateMessageReceivedEvent.
      * @param message Message content.
      */
@@ -22,8 +21,7 @@ public class SpectraHelper
     }
 
     /**
-     * Notifies Spectra about Hunter Rank changes.
-     *
+     * <b>Notifies Spectra about Hunter Rank changes.</b>
      * @param event Required JDA PrivateMessageReceivedEvent.
      * @param profile Profile that contains the Hunter Rank to send.
      */

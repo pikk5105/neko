@@ -12,8 +12,6 @@ public class JDAHelper
 
     /**
      * <b>Sends Direct Message to a user.</b>
-     *
-     *
      * @param event Required JDA PrivateMessageReceivedEvent.
      * @param message Message to send user.
      */
@@ -24,7 +22,6 @@ public class JDAHelper
 
     /**
      * <b>Sends Direct Message to a user identified by UserID.</b>
-     *
      * @param event Required JDA PrivateMessageReceivedEvent.
      * @param UserID User Identifier whom will be messaged.
      * @param message Message to send user.
@@ -36,7 +33,6 @@ public class JDAHelper
 
     /**
      * <b>Responds to a user on direct-messaging.</b>
-     *
      * @param event Required JDA PrivateMessageReceivedEvent.
      * @param message Message to send user.
      */
@@ -47,7 +43,6 @@ public class JDAHelper
 
     /**
      * <b>Messages user directly within context.</b>
-     *
      * @param event Required JDA PrivateMessageReceivedEvent.
      * @param message Message to send.
      */
@@ -58,7 +53,6 @@ public class JDAHelper
 
     /**
      * <b>Retrieves Guild Object by ID.</b>
-     *
      * @param event Required JDA PrivateMessageReceivedEvent.
      * @param guildID GuildID to look for.
      * @return Returns found Guild object.
@@ -70,7 +64,6 @@ public class JDAHelper
 
     /**
      * <b>Retrieves Monster Hunter Gathering Hall Object</b>
-     *
      * @param event Required JDA PrivateMessageReceivedEvent.
      * @return Returns MHGH guild object.
      */
@@ -82,7 +75,6 @@ public class JDAHelper
 
     /**
      * <b>Gets UserID of messaging user.</b>
-     *
      * @param event Required JDA PrivateMessageReceivedEvent.
      * @return Returns Discord UserID.
      */
@@ -93,7 +85,6 @@ public class JDAHelper
 
     /**
      * <b>Retrieves Discord Username</b>
-     *
      * @param event Required JDA PrivateMessageReceivedEvent.
      * @param userID Discord UserID to retrieve username for.
      * @return Returns found Username.
@@ -105,7 +96,6 @@ public class JDAHelper
 
     /**
      * <b>Retrieves Private Message content.</b>
-     *
      * @param event Required JDA PrivateMessageReceivedEvent.
      * @return Returns Message Content.
      */
@@ -116,7 +106,6 @@ public class JDAHelper
 
     /**
      * <b>Declares Shutdown of JDA instance. Careful, user filtering needs to be done in advance (ADMIN Privileges)</b>
-     *
      * @param event Required JDA PrivateMessageReceivedEvent.
      */
     public static void Shutdown(PrivateMessageReceivedEvent event)
