@@ -86,4 +86,14 @@ public class Error
     {
         return "I could meownt find any hunters like that.";
     }
+
+    public String HasRequestPending()
+    {
+        return "That hunter already has a request pending from a leader, I can't ask him until he answers that request.";
+    }
+
+    public String InvalidSlotRange(String username)
+    {
+        return "you can only have 0-3 slots for hunters not including yourself **__"+username+"__**";
+    }
 }
