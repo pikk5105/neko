@@ -13,7 +13,7 @@ public class Room
     private String passcode = "";
     private Hunt hunt       = null;
 
-    protected int slots     = 4;
+    final int slots     = 4;
     private int usedSlots   = 1;
     private String roomDescription = "";
     private List<Profile> hunters   = new ArrayList<Profile>();
@@ -50,6 +50,8 @@ public class Room
         SetPasscode(newPasscode);
         hunt = new Hunt(newHuntRank, newMonster);
     }
+
+    public Room(){};
 
     public Hunt GetHunt()
     {
@@ -119,9 +121,9 @@ public class Room
         }
     }
 
-    public int GetUsedSlots()
+    public int GetRemainingSlots()
     {
-        return usedSlots;
+        return slots-usedSlots;
     }
 
     public List<Profile> GetHuntersList()
