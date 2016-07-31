@@ -17,6 +17,7 @@ import net.dv8tion.jda.OnlineStatus;
 import net.dv8tion.jda.entities.Guild;
 import net.dv8tion.jda.entities.User;
 import net.dv8tion.jda.entities.impl.GuildImpl;
+import net.dv8tion.jda.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.hooks.ListenerAdapter;
@@ -102,6 +103,45 @@ List<Merc> mercList = new ArrayList<>();
                 }*/
                 event.getChannel().sendMessageAsync("Nya **__"+event.getAuthorName()+"__**! send me a personal meowssage to list yourself, delist yourself, or ask me for help",null);    
                 event.getAuthor().getPrivateChannel().sendMessageAsync("how can I help you?",null);
+            }
+        }
+        
+        else if(message.matches("(?i)^[/%]post\\s.*"))
+        {
+            String[] parts = message.split("\\s+",4);
+            if(parts.length<3)//usage error
+            {
+                String usage = "Usage: `/post` `<gathering-hall-id>` `<pass>` `[description]`";
+                event.getChannel().sendMessageAsync(usage, m -> {CallDepend.getInstance().add(event.getMessage().getId(), m);});
+            }
+            else
+            {
+                String spacer = "                    ";
+                String name = event.getGuild().getNicknameForUser(event.getAuthor());
+                if(name==null)
+                    name =event.getAuthor().getUsername();
+                name = (name+spacer).substring(0,20);
+                String hallId = (parts[1]+spacer).substring(0,20);
+                String pass = (parts[2]+spacer).substring(0,20);
+                String details = parts.length<4 ? null : parts[3];
+                
+                StringBuilder builder = new StringBuilder("**MHGenerations**```fix");
+                builder.append("\n╔════╦════════════════════╗");
+                builder.append("\n║User║").append(name).append("║");
+                builder.append("\n║Hall║").append(hallId).append("║");
+                builder.append("\n║Pass║").append(pass).append("║");
+                if(details==null)
+                {
+                    builder.append("\n╚════╩════════════════════╝");
+                }
+                else
+                {
+                    details = details+spacer+"      ";
+                    builder.append("\n╠════╩════════════════════╣");
+                    builder.append(details.replaceAll("(.{25})(?:\\s+$)?", "║$1║\n"));
+                    builder.append("╚═════════════════════════╝");
+                }
+                event.getChannel().sendMessageAsync(builder.toString(), m -> {CallDepend.getInstance().add(event.getMessage().getId(), m);});
             }
         }
 
@@ -959,6 +999,11 @@ List<Merc> mercList = new ArrayList<>();
                     + "if you need help, just type help.",null);
             
         }
+    }
+
+    @Override
+    public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
+        CallDepend.getInstance().delete(event.getMessageId());
     }
     
     
