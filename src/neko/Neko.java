@@ -151,7 +151,7 @@ List<Merc> mercList = new ArrayList<>();
 
                 }
             } catch(Exception e){
-                event.getChannel().sendMessageAsync("hunter may have corrupted data, please let @pikk know so he may try to fix his dumb error",null);
+                event.getChannel().sendMessageAsync("hunter has not set up their guild card. encorage them to type /neko in #bot_stuff",null);
                 System.out.println("error with: " +users.get(0).getId());
                 //System.out.println(event.getJDA().getUserById(Profiles.getInstance().getProfile(users.get(0).getId()).UserID).getUsername());
             }
