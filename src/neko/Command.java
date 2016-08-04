@@ -5,20 +5,28 @@
  */
 package neko;
 
+import net.dv8tion.jda.events.message.MessageReceivedEvent;
+
 /**
  *
  * @author Brady
  */
-public class Command
+public abstract class Command
 {
-    String name="";
-    boolean privateCommand;
+    private String name="";
+    private String command="";
+    private String[] args;
+    private boolean privateCommand;
     
-    Command(String name, boolean privateCommand, String[] Args){
-    
-        
+    Command(String name, String command, boolean privateCommand, String[] args)
+    {
+        this.name = name;
+        this.command = command;
+        this.privateCommand = privateCommand;
+        this.args = args;
+
     }
-    
-    
-    
+
+    public abstract void Run();
+    public abstract boolean Exec();
 }
