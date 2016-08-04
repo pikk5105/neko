@@ -8,13 +8,10 @@ import net.dv8tion.jda.events.message.MessageReceivedEvent;
 public abstract class InteractiveCommand extends Command
 {
     private int step = 0;
-    private boolean finished = false;
-    private String lastMessage;
 
     public InteractiveCommand(String name, String command, boolean privateCommand, String[] args)
     {
         super(name, command, privateCommand, args);
-        this.lastMessage = "";
     }
 
     public void SetStep(int step)
@@ -22,19 +19,14 @@ public abstract class InteractiveCommand extends Command
         this.step = step;
     }
 
+    public void IncStep()
+    {
+        step++;
+    }
+
     public int GetStep()
     {
         return step;
-    }
-
-    public void SetFinishState(boolean state)
-    {
-        this.finished = state;
-    }
-
-    public boolean GetFinishState()
-    {
-        return finished;
     }
 
     public String ReadMessage(MessageReceivedEvent event)
