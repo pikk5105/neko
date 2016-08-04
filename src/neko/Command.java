@@ -27,6 +27,46 @@ public abstract class Command
 
     }
 
+    public void SetName(String name)
+    {
+        this.name = name;
+    }
+
+    public String GetName()
+    {
+        return name;
+    }
+
+    public void SetCommand(String command)
+    {
+        this.command = command;
+    }
+
+    public String GetCommand()
+    {
+        return command;
+    }
+
+    public void SetArgs(String[] args)
+    {
+        this.args = args;
+    }
+
+    public String[] GetArgs()
+    {
+        return args;
+    }
+
+    public void SetPrivate(boolean flag)
+    {
+        this.privateCommand = flag;
+    }
+
+    public boolean GetPrivate()
+    {
+        return privateCommand;
+    }
+
     public abstract void Run();
     public abstract boolean Exec();
 }
