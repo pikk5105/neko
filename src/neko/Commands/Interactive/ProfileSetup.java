@@ -16,44 +16,38 @@ public class ProfileSetup extends InteractiveCommand
     @Override
     public void Run()
     {
-        while(GetFinishState())
+        switch (GetStep())
         {
-            switch(GetStep())
+            case 0:
             {
-                case 0:
+                //TODO Greeting
+                if(Exec())
                 {
-                    //TODO Greeting
-                    Exec();
-                    SetStep(1);
-                }
-                case 1:
-                {
-                    //TODO Weapons Setup
-                    Exec();
-                    SetStep(2);
-                }
-                case 2:
-                {
-                    //TODO Roles Setup
-                    Exec();
-                    SetStep(3);
-                }
-                case 3:
-                {
-                    //TODO Hunter Rank
-                    Exec();
-                    SetFinishState(true);
+                    IncStep();
                 }
             }
-            if(GetFinishState())
+            case 1:
             {
-                boolean accepted = false;
-
-                //TODO Display input and ask if correct
-
-                if(!accepted)
+                //TODO Weapons Setup
+                if(Exec())
                 {
-                    SetFinishState(false);
+                    IncStep();
+                }
+            }
+            case 2:
+            {
+                //TODO Roles Setup
+                if(Exec())
+                {
+                    IncStep();
+                }
+            }
+            case 3:
+            {
+                //TODO Hunter Rank
+                if(Exec())
+                {
+                    IncStep();
                 }
             }
         }
