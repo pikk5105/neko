@@ -106,7 +106,7 @@ List<Merc> mercList = new ArrayList<>();
             }
         }
         
-        else if(message.matches("(?i)^[/%]post\\s.*"))
+        else if(message.matches("(?i)^[/%]post(\\s.*)?"))
         {
             String[] parts = message.split("\\s+",4);
             if(parts.length<3)//usage error
@@ -132,14 +132,14 @@ List<Merc> mercList = new ArrayList<>();
                 builder.append("\n║Pass║").append(pass).append("║");
                 if(details==null)
                 {
-                    builder.append("\n╚════╩════════════════════╝");
+                    builder.append("\n╚════╩════════════════════╝```");
                 }
                 else
                 {
                     details = details+spacer+"      ";
-                    builder.append("\n╠════╩════════════════════╣");
+                    builder.append("\n╠════╩════════════════════╣\n");
                     builder.append(details.replaceAll("(.{25})(?:\\s+$)?", "║$1║\n"));
-                    builder.append("╚═════════════════════════╝");
+                    builder.append("╚═════════════════════════╝```");
                 }
                 event.getChannel().sendMessageAsync(builder.toString(), m -> {CallDepend.getInstance().add(event.getMessage().getId(), m);});
             }
@@ -191,7 +191,7 @@ List<Merc> mercList = new ArrayList<>();
 
                 }
             } catch(Exception e){
-                event.getChannel().sendMessageAsync("hunter may have corrupted data, please let @pikk know so he may try to fix his dumb error",null);
+                event.getChannel().sendMessageAsync("hunter has not made a profile.",null);
                 System.out.println("error with: " +users.get(0).getId());
                 //System.out.println(event.getJDA().getUserById(Profiles.getInstance().getProfile(users.get(0).getId()).UserID).getUsername());
             }
